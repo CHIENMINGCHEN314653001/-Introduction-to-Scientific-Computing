@@ -1,0 +1,52 @@
+import warnings
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import lagrange, BarycentricInterpolator, splrep, splev
+
+def f(x):
+    return np.sin(x)
+
+point_counts = [10, 10**2, 10**3]  # 10, 100, 1000 points
+x_eval = np.linspace(0, 1, 1000)
+
+plt.figure(figsize=(15, 12))
+
+for i, n_points in enumerate(point_counts, 1):
+    x_nodes = np.linspace(0, 1, n_points)
+    y_nodes = f(x_nodes)
+
+    y_lagrange = None
+    if n_points <= 200:
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")  # Ignore RankWarning
+                poly_lagrange = lagrange(x_nodes, y_nodes)
+            y_lagrange = poly_lagrange(x_eval)
+        except Exception as e:
+            print(f"Lagrange interpolation failed for {n_points} points: {e}")
+
+    bary = BarycentricInterpolator(x_nodes, y_nodes)
+    y_barycentric = bary(x_eval)
+
+    tck = splrep(x_nodes, y_nodes, k=3, s=0)
+    y_spline = splev(x_eval, tck)
+
+    y_true = f(x_eval)
+
+    plt.subplot(3, 1, i)
+    plt.plot(x_eval, y_true, 'k-', label='True function sin(x)')
+    if y_lagrange is not None:
+        plt.plot(x_eval, y_lagrange, 'r--', label='Lagrange polynomial interpolation')
+    plt.plot(x_eval, y_barycentric, 'g-.', label='Barycentric interpolation')
+    plt.plot(x_eval, y_spline, 'b:', label='Cubic spline interpolation')
+
+    step = max(n_points // 200, 1)
+    scatter_label = 'Sampled interpolation nodes' if i == 1 else None
+    plt.scatter(x_nodes[::step], y_nodes[::step], s=10, c='black', alpha=0.3, label=scatter_label)
+
+    plt.title(f'Number of interpolation points: {n_points}')
+    plt.legend()
+    plt.grid(True)
+
+plt.tight_layout()
+plt.show()
