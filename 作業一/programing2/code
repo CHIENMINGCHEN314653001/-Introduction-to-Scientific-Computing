@@ -1,0 +1,38 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import BarycentricInterpolator, CubicSpline
+
+def runge_function(x):
+    return 1 / (1 + 25 * x**2)
+
+x_plot = np.linspace(-1, 1, 500)
+
+n = 15
+x_equidistant = np.linspace(-1, 1, n+1)
+y_equidistant = runge_function(x_equidistant)
+poly_equidistant = BarycentricInterpolator(x_equidistant, y_equidistant)
+y_poly_equidistant = poly_equidistant(x_plot)
+
+k = np.arange(n+1)
+x_chebyshev = np.cos((2*k + 1) / (2*(n+1)) * np.pi)
+y_chebyshev = runge_function(x_chebyshev)
+poly_chebyshev = BarycentricInterpolator(x_chebyshev, y_chebyshev)
+y_poly_chebyshev = poly_chebyshev(x_plot)
+
+spline = CubicSpline(x_equidistant, y_equidistant)
+y_spline = spline(x_plot)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_plot, runge_function(x_plot), 'k-', label='Runge function (true)')
+plt.plot(x_plot, y_poly_equidistant, 'r--', label='Equally spaced polynomial interpolation')
+plt.plot(x_plot, y_poly_chebyshev, 'b-.', label='Chebyshev nodes polynomial interpolation')
+plt.plot(x_plot, y_spline, 'g:', label='Cubic spline interpolation')
+plt.scatter(x_equidistant, y_equidistant, c='red', marker='o', label='Equally spaced points')
+plt.scatter(x_chebyshev, y_chebyshev, c='blue', marker='x', label='Chebyshev nodes')
+plt.legend()
+plt.title('Runge Phenomenon and Methods to Avoid It')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.grid(True)
+plt.show()
+
