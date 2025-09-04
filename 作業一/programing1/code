@@ -6,7 +6,7 @@ from scipy.interpolate import lagrange, BarycentricInterpolator, splrep, splev
 def f(x):
     return np.sin(x)
 
-point_counts = [10, 10**2, 10**3]  # 10, 100, 1000 points
+point_counts = [10, 10**2, 10**3]  
 x_eval = np.linspace(0, 1, 1000)
 
 plt.figure(figsize=(15, 12))
@@ -19,7 +19,7 @@ for i, n_points in enumerate(point_counts, 1):
     if n_points <= 200:
         try:
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")  # Ignore RankWarning
+                warnings.simplefilter("ignore")  
                 poly_lagrange = lagrange(x_nodes, y_nodes)
             y_lagrange = poly_lagrange(x_eval)
         except Exception as e:
