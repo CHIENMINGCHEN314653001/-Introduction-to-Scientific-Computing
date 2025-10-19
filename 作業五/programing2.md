@@ -1,6 +1,7 @@
 **Consider solving the following problem using forward Euler method**
 
-$$y' = y(1-y), \quad y(0)=y_0 ,\quad 0<y_0<1$$.
+$$y' = y(1-y), \quad y(0)=y_0 ,\quad 0< y_0 <1$$
+
 
 **Find the range of $$ℎ$$ such that the solution is qualitatively correct.**
 
@@ -92,3 +93,9 @@ When $$h$$ exceeds the stability limit $$h \ge 2$$ , these qualitative propertie
 </td>
 </tr>
 </table>
+
+---
+
+**programing**
+
+link:https://colab.research.google.com/drive/11bV7JblL4nw54jSwVEkzq0fiji16vBYx?usp=sharing
