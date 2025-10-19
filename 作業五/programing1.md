@@ -28,13 +28,40 @@ plt.legend(); plt.grid(True)
 </td>
 <td width="55%">
 
-### Explanation
+**Explanation**
 
-- When  $$y' = -5y$$ , the analytical solution decays rapidly toward zero.
-- The Forward Euler update rule is $$\[y_{n+1} = (1 - 5h) y_n\].$$
-- If $$h < 0.4$$, the numerical solution remains stable.  
-- When $$h = 0.41$$, we have  $$1 - 5h = -1.05$$.  
-  The solution starts to oscillate and diverge, showing that the Forward Euler method becomes unstable for stiff problems.
+For the differential equation $$y' = -5y, y(0) = 1$$ the analytical solution is $$y(t) = e^{-5t},$$ ,which represents a rapid exponential decay. 
+
+As $$t \to \infty$$, we have $$y(t) \to 0$$.
+
+The Forward Euler method gives: $$y_{n+1} = y_n + h f(t_n, y_n) = y_n + h (-5y_n)$$ .
+
+---
+
+**Stability Analysis**
+
+To ensure numerical stability, the amplification factor must satisfy $$|\mathbf{1 - 5h}| \le 1.$$
+
+This leads to the stability condition $$-1 \le 1 - 5h \le 1 \quad \Rightarrow \quad \mathbf{0 \le h \le 0.4.}$$
+
+---
+
+**Result Observations**
+
+* When $$h = 0.1$$: $$|1 - 5h| = 0.5 < 1 →$$  
+  The numerical solution closely matches the analytical one and shows smooth exponential decay.
+* When $$h = 0.4$$: $$|1 - 5h| = 0 →$$
+  The numerical solution becomes critically stable, reaching zero in a single step.
+* When $$h = 0.41$$: $$|1 - 5h| = 1.05 > 1$$ →  
+  The solution starts to oscillate and diverge, demonstrating instability.
+
+---
+
+**Conclusion**
+
+This clearly shows that the Forward Euler method exhibits conditional stability.  
+For problems such as $$y' = \lambda y $$ with large negative $$\lambda$$ , the method is stable only if the step size $$h$$ satisfies strict limits.
+
 
 </td>
 </tr>
@@ -73,13 +100,52 @@ plt.legend(); plt.grid(True)
 </td>
 <td width="55%">
 
-**Explanation**
+**Backward Euler Method Stability Analysis**
 
-- For $$y' = 5y$$, the analytical solution grows exponentially.
-- The Backward Euler update rule is  $$\[y_{n+1} = \frac{y_n}{1 - 5h}\].$$
-- Even for large step sizes \( h \), the numerical solution remains stable, although the error may increase.
-- This demonstrates that the Backward Euler method is A-stable, making it suitable for stiff differential equations.
+For the differential equation $$y' = 5y, \quad y(0) = 1$$
+the analytical solution is $$y(t) = e^{5t}$$ ,which represents a rapid exponential growth as $$t$$ increases.
+
+---
+**Iterative Formula**
+
+The Backward Euler method gives:
+$$y_{n+1} = y_n + h f(t_{n+1}, y_{n+1}) = y_n + h (5y_{n+1})$$
+
+Solving for $$y_{n+1}$$ : $$\mathbf{y_{n+1} = \frac{y_n}{1 - 5h}.}$$
+
+---
+
+**Stability Analysis**
+
+For a general linear test equation $$y' = \lambda y$$ ,the amplification factor of the Backward Euler method is $$G = \mathbf{\frac{1}{1 - \lambda h}}$$ .
+
+When $$\text{Re}(\lambda) < 0$$ ,we have $$\left|\frac{1}{1 - \lambda h}\right| < 1 \quad\text{for any } h > 0$$.
+
+---
+
+**Result Observations**
+
+In this problem, we have $$\mathbf{\lambda = 5 > 0}$$, and the analytical solution $$y(t) = e^{5t}$$ diverges exponentially. Therefore, the numerical solution should also grow rapidly.
+
+* When $$h = 0.1$$:  
+  The numerical solution closely follows the exponential growth of the analytical solution,reaching very large values by $$t = 10$$.
+
+* When $$h = 0.4$$   or   $$h = 0.41$$ :
+  The growth rate is underestimated because $$|1 - 5h|$$ becomes small or negative, causing $$y_{n+1}$$ to deviate from the analytical trajectory.  
+  However, unlike Forward Euler, no oscillatory divergence occurs.
+
+---
+
+**Conclusion**
+
+When $$\lambda < 0$$, it remains numerically stable for any step size $$h$$ ,avoiding oscillations or divergence even for stiff problems.
+
+For $$\lambda > 0$$ , the analytical solution itself diverges, so the numerical solution should also diverge ,but Backward Euler still preserves smooth, non-oscillatory behavior, whereas Forward Euler tends to oscillate and blow up.
 
 </td>
 </tr>
 </table>
+
+---
+**Programing**
+link:https://colab.research.google.com/drive/1QpG1O0_r_LfSCde9M3tXlooyjB8A3-ig?usp=sharing
