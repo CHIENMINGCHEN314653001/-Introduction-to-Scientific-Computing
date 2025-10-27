@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="math.css">
+    <link rel="icon" href="NYCU.png" type="image/png" />
+    <title>科學計算導論證明一</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <h1>證明：\( w_i = \frac{1}{\omega_{n+1}'(x_i)} \)</h1>
+    
+    <div class="theorem">
+        <h2>定義</h2>
+        <p>給定節點 \( x_0, x_1, \ldots, x_n \)，定義：</p>
+        <p>\[
+        \omega_{n+1}(x) = \prod_{i=0}^n (x - x_i)
+        \]</p>
+        <p>\[
+        w_i = \prod_{\substack{j=0 \\ j \neq i}}^n \frac{1}{x_i - x_j}
+        \]</p>
+    </div>
+
+    <div class="proof">
+        <h2>證明步驟</h2>
+
+        <div class="step">
+            <h3>1. 計算導數 \( \omega_{n+1}'(x) \)</h3>
+            <p>使用乘積法則：</p>
+            <p>\[
+            \omega_{n+1}'(x) = \sum_{m=0}^n \prod_{\substack{k=0 \\ k \neq m}}^n (x - x_k)
+            \]</p>
+        </div>
+
+        <div class="step">
+            <h3>2. 計算 \( \omega_{n+1}'(x_i) \)</h3>
+            <p>代入 \( x = x_i \)：</p>
+            <p>\[
+            \omega_{n+1}'(x_i) = \sum_{m=0}^n \prod_{\substack{k=0 \\ k \neq m}}^n (x_i - x_k)
+            \]</p>
+            <p>分析求和項：</p>
+            <ul>
+                <li>當 \( m \neq i \) 時，乘積中包含因子 \( (x_i - x_i) = 0 \)，故這些項為 0</li>
+                <li>當 \( m = i \) 時，乘積為：</li>
+            </ul>
+            <p>\[
+            \prod_{\substack{k=0 \\ k \neq i}}^n (x_i - x_k)
+            \]</p>
+            <p>因此：</p>
+            <p>\[
+            \omega_{n+1}'(x_i) = \prod_{\substack{j=0 \\ j \neq i}}^n (x_i - x_j)
+            \]</p>
+        </div>
+
+        <div class="step">
+            <h3>3. 取倒數</h3>
+            <p>\[
+            \frac{1}{\omega_{n+1}'(x_i)} = \frac{1}{\prod_{\substack{j=0 \\ j \neq i}}^n (x_i - x_j)} = \prod_{\substack{j=0 \\ j \neq i}}^n \frac{1}{x_i - x_j} = w_i
+            \]</p>
+        </div>
+    </div>
+
+    <div class="conclusion">
+        <p>\[
+        \therefore w_i = \frac{1}{\omega_{n+1}'(x_i)}
+        \]</p>
+    </div>
+</body>
+</html>
