@@ -111,3 +111,7 @@ plt.show()
 * Forward Euler is an explicit method, making it simple to implement, but it is highly sensitive to the choice of step size** for stability.
 * Backward Euler is an implicit method, which is inherently more stable, particularly for stiff ODEs or those with rapidly growing solutions. However, it is generally computationally heavier as it requires solving an equation at each step.
 * The visual comparison from the plots clearly illustrates how step size significantly impacts both the stability and accuracy of these numerical methods.
+
+---
+**Programing**
+link:https://colab.research.google.com/drive/1QpG1O0_r_LfSCde9M3tXlooyjB8A3-ig?usp=sharing
