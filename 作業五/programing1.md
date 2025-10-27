@@ -99,10 +99,10 @@ plt.show()
 
 ## Conclusions
 
-| Method         | Stability           | Behavior                                     | Recommended Step Size |
-| :------------- | :------------------ | :------------------------------------------- | :-------------------- |
-| Forward Euler  | Conditionally stable | Diverges if $h > 0.4$                       | $h < 0.4$             |
-| Backward Euler | Unconditionally stable | Stable for any $h$                         | Any $h$ (smaller gives higher accuracy) |
+| Method | Stability | Behavior | Recommended Step Size |
+| :---: | :---: | :---: | :---: |
+| Forward Euler  | Conditionally stable | Diverges if $$h > 0.4$$ | $$h < 0.4$$  |
+| Backward Euler | Unconditionally stable | Stable for any $$h$$  | Any $$h$$ |
 
 ---
 
