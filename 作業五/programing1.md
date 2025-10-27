@@ -85,7 +85,7 @@ plt.show()
 * For $$h=0.41$$, the solution exhibits noticeable oscillations and rapidly diverges from the exact solution.
 * For $h=0.1$, which satisfies the stability condition, the approximation is accurate and stable.
 
-![Figure 2: Forward Euler Method ($y' = -5y, y(0)=1$) results for various step sizes. Shows conditional stability.](圖二.jpg)
+![Figure 1: Forward Euler Method ($y' = -5y, y(0)=1$) results for various step sizes. Shows conditional stability.](圖一.jpg)
 
 * Backward Euler ($$y' = 5y$$)
 
@@ -93,7 +93,7 @@ plt.show()
 * Even with relatively large step sizes ($$h=0.4$$ or $$h=0.41$$), the numerical solution grows smoothly, correctly matching the exponential trend of the exact solution.
 * Smaller $h$ values (like $$h=0.1$$) improve the accuracy of the approximation but are not strictly required for stability in this case.
 
-![Figure 1: Backward Euler Method ($$y' = 5y, y(0)=1$$) results for various step sizes. Demonstrates unconditional stability.](圖一.jpg)
+![Figure 2: Backward Euler Method ($$y' = 5y, y(0)=1$$) results for various step sizes. Demonstrates unconditional stability.](圖二.jpg)
 
 ---
 
