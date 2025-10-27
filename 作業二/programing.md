@@ -216,3 +216,7 @@ Comparison of resource consumption and performance for both methods when achievi
 **Core Error Analysis**
 
 ![Figure 4: Comparison of Absolute Errors (Log Scale) for both interpolation methods. The peak error of Chebyshev interpolation (blue line) is lower than that of cubic spline interpolation (red line), and convergence is better at the boundaries.](圖四.jpg)
+
+---
+**Programing**
+link:https://colab.research.google.com/drive/1dYs9uwoncZql1Pp9KEjHVFNbfD40fok2?usp=sharing
