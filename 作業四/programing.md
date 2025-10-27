@@ -60,7 +60,7 @@ if __name__ == "__main__":
     print("2. Verified the first integral against its exact value π/10.")
     print("3. Verified the second integral using mpmath high-precision integration.")
 ```
-### Conclusion (Numerical Integration with Required Accuracy $$< 10^{-10}$$)
+#### Conclusion (Numerical Integration with Required Accuracy $$< 10^{-10}$$)
  
 
 **Integration Results**
@@ -68,27 +68,27 @@ if __name__ == "__main__":
 * $$\int_0^\infty \frac{1}{1+25x^2} dx$$
 
 | Metric | Value |
-| :--- | :--- |
+| :---: | :---:|
 | Numerical Result | $0.314159265358979$ |
 | Estimated Error | $2.72 \times 10^{-13}$ |
 | Exact Value | $0.314159265358979$ |
 | Absolute Error | $0.00 \times 10^{+00}$ |
-| Requirement Met? | **✓** |
+| Requirement Met? | yes |
 
 ---
 * $$\int_0^1 \frac{\ln(x)}{1+25x^2} dx$$
 
 | Metric | Value |
-| :--- | :--- |
+| :---: | :---: |
 | Numerical Result | $$-0.545444563419798$$ |
 | Estimated Error | $$7.65 \times 10^{-13}$$ |
-| Requirement Met? | ✓ |
+| Requirement Met? | yes |
 
 ---
 * High-precision validation with mpmath (50 digits):
 
 | Metric | Value |
-| :--- | :--- |
+| :---: | :---: |
 | **Result (mpmath)** | $-0.545444563419798$ |
 | **Absolute Error** | $2.22 \times 10^{-16}$ |
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 * Final Summary
 
 | Integral | Result |
-| :--- | :--- |
+| :---: | :---: |
 | $\int_0^\infty \frac{1}{1+25x^2} dx$ | $0.314159265358979$ |
 | $\int_0^1 \frac{\ln(x)}{1+25x^2} dx$ | $-0.545444563419798$ |
 
