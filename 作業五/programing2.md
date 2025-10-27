@@ -83,6 +83,7 @@ Using the initial value $$y_0=0.2$$ in the Forward Euler method, the following b
 * $$h=1.9$$: Close to the stability boundary ($$0<h<2$$), may show minor oscillation or overshoot, but remains qualitatively correct (converges to $y=1$).
 * $$h=2.1$$: Exceeds the boundary ($$h>2$$), resulting in large oscillations or divergence, making the numerical solution qualitatively incorrect.
 [Forward Euler Stability for Logistic Equation y'=y(1-y) showing h=2.1 diverging while h<2 remains stable.](圖三.jpg)
+
 ---
 
 **Recommendations**
