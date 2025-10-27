@@ -75,6 +75,7 @@ if __name__ == "__main__":
 | Absolute Error | $0.00 \times 10^{+00}$ |
 | Requirement Met? | **✓** |
 
+---
 * $$\int_0^1 \frac{\ln(x)}{1+25x^2} dx$$
 
 | Metric | Value |
@@ -83,6 +84,7 @@ if __name__ == "__main__":
 | Estimated Error | $$7.65 \times 10^{-13}$$ |
 | Requirement Met? | ✓ |
 
+---
 * High-precision validation with mpmath (50 digits):
 
 | Metric | Value |
@@ -99,6 +101,11 @@ if __name__ == "__main__":
 | $\int_0^\infty \frac{1}{1+25x^2} dx$ | $0.314159265358979$ |
 | $\int_0^1 \frac{\ln(x)}{1+25x^2} dx$ | $-0.545444563419798$ |
 
-1.  Used `scipy.integrate.quad` to compute both integrals, successfully achieving an estimated error less than the required tolerance of $10^{-10}$.
-2.  The first integral, $\int_0^\infty \frac{1}{1+25x^2} dx$, was analytically verified against its exact value, which is $\frac{\pi}{10}$.
-3.  The second integral, $\int_0^1 \frac{\ln(x)}{1+25x^2} dx$, was verified using the high-precision integration capabilities of the `mpmath` library.
+  * Used `scipy.integrate.quad` to compute both integrals, successfully achieving an estimated error less than the required tolerance of $10^{-10}$.
+  * The first integral, $\int_0^\infty \frac{1}{1+25x^2} dx$, was analytically verified against its exact value, which is $\frac{\pi}{10}$.
+  * The second integral, $\int_0^1 \frac{\ln(x)}{1+25x^2} dx$, was verified using the high-precision integration capabilities of the `mpmath` library.
+
+---
+**Programing**
+link:https://colab.research.google.com/drive/172BRKa3BMVr5Pu2PM1V2m4YW264hcnAc?usp=sharing
+
