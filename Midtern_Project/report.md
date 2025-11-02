@@ -1,7 +1,11 @@
 **Application of the AAA Algorithm in Rational Approximation**
 
 ---
+**Abstract**
 
+This report studies and reproduces the core ideas of *“The AAA Algorithm for Rational Approximation”* by Nakatsukasa, Sète, and Trefethen (2017). The AAA algorithm provides a numerically stable, adaptive, and automatic method to construct rational approximations of complex-valued functions.  It transforms a nonlinear rational fitting problem into a sequence of linear least-squares problems via barycentric representation and singular value decomposition (SVD). In this work, we implement both simplified and advanced versions of the algorithm in Python, apply it to the function $$f(z) = \tan(\pi z / 2)$$ , and visualize its behavior. The results confirm exponential convergence, automatic detection of poles near singularities, and robustness against numerical instability. Through theoretical explanation and experimental visualization, this study demonstrates how AAA achieves near machine precision with minimal parameters, highlighting its potential in model reduction, system identification, and analytic continuation.
+
+---
 **Ⅰ. Introduction 、 Problem Description and Motivataion**
 
 #### Background and Motivation
@@ -19,7 +23,7 @@ The AAA algorithm, proposed by Nakatsukasa, Sète, and Trefethen in 2017, aims t
 #### Problem Statement
 
 Given a complex (or real) function $$f(z)$$ sampled at discrete points
-$$Z = \{z_i\}_{i=1}^N$$ , 
+$$Z = \{z_i\}_{i=1}^N$$ ,
 
 with corresponding values 
 $$F = \{f(z_i)\}_{i=1}^N$$
