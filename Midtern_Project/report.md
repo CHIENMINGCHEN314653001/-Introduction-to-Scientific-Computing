@@ -37,7 +37,7 @@ For functions with poles or branch cuts, polynomial approximations perform poorl
 
 ---
 
-**Ⅱ. Method Overview – Core Ideas**
+**Ⅱ. Method**
 
 The core idea of the AAA algorithm is to transform the nonlinear problem of rational approximation into a sequence of adaptive support-point selections and linear least-squares problems.
 
@@ -51,7 +51,7 @@ $$
 
 where $\{z_j\}_{j=1}^m$ are the selected support points, $f_j = f(z_j)$ are the corresponding function values, and $w_j$ are the weights.
 
-#### Advantages
+##### Advantages
 
 * This form defines a rational function $r(z)$ of type at most $(m-1, m-1).$
 * Because the basis functions $\frac{1}{(z - z_j)}$ are simple fractions, the barycentric form is numerically more stable than direct manipulation of polynomial coefficients.
@@ -59,11 +59,11 @@ where $\{z_j\}_{j=1}^m$ are the selected support points, $f_j = f(z_j)$ are the 
 * Comparison of Runge Phenomenon: A brief comparison shows that polynomial interpolation (such as polynomial interpolation at equally spaced points) is prone to the Runge phenomenon, while AAA, through adaptive selection of interpolation points/support points and the use of fractional bases, fundamentally avoids instability on complex functions.
 * The difference from Padé approximation: Traditional Padé approximation requires calculating polynomial coefficients, which is numerically prone to ill-conditioned problems. The barycentric form of AAA effectively bypasses this problem.
 
-#### Interpolation Property
+##### Interpolation Property
 
 In this representation, as $z \to z_j$, $r(z)$ has a removable singularity satisfying $r(z_j) = f_j$, ensuring exact interpolation at support points.
 
-#### Greedy Support Selection and Linearized Least-Squares
+##### Greedy Support Selection and Linearized Least-Squares
 
 The AAA algorithm is an adaptive iterative process, where each iteration $k$ adds one new support point until convergence tolerance is reached.
 
@@ -91,41 +91,39 @@ $$A = \mathrm{diag}(F|_{Z'}) C - C \cdot \mathrm{diag}(\{f_j\}_{j=1}^k)$$
 
 * Stopping criterion: Stop when the maximum residual is below a relative tolerance (e.g., $$10^{-13}$$) or when $$m$$ reaches $$m_{max}$$
 
-#### Cleanup – Handling Froissart Doublets
+##### Froissart Doublets
 
 In practice, spurious pole-zero pairs with negligible residues may appear. These can harm stability and accuracy. The cleanup procedure checks the poles' residues and removes support points associated with negligible residues, then recomputes the least-squares solution to improve stability.
 
 ---
 
-**Ⅲ. Simple Implementation**
+**Ⅲ.Implementation**
 
 A compact implementation demonstrates the algebraic core of AAA:
 
-* Input: Sample points $$Z$$, values $$F$$, tolerance `tol`, and maximum steps `mmax`.
+* Input: Sample points $$Z$$, values $$F$$, tolerance, and maximum steps .
 * Core loop:
   * Select the point with the largest residual as a new support point.
   * Build the Cauchy and Loewner-like matrices.
   * Perform SVD on $$A$$ and take the right singular vector of the smallest singular value as $$\mathbf{w}$$.
   * Update $$r(z) = \frac{p(z)}{q(z)}.$$
-* Output: Returns a callable rational approximant `r_eval`, support points, weights, and the error history `errvec`.
+* Output: Returns a callable rational approximant, support points, weights, and the error history.
 
-This version highlights the algebraic structure (Cauchy matrix, Loewner matrix, SVD) but omits full numerical robustness features.
+This version highlights the Cauchy matrix, Loewner matrix, SVD .
 
 ---
 
-**Ⅳ. Small Experiment**
+**Ⅳ. Experiment**
 
 #### Objective and Setup
 
-We test the AAA algorithm on a function with infinitely many poles:
+Testing the AAA algorithm on a function with infinitely many poles:
 
 $$
 f(z) = \tan\left(\frac{\pi z}{2}\right)
 $$
 
 using sample points $Z$ distributed along a spiral in the complex plane. Because $f(z)$ has periodic poles, it represents a case where polynomial approximations perform poorly, but rational approximations excel.
-
-#### Experimental Significance
 
 The goal is to verify whether AAA can automatically and efficiently place support points and weights near poles to approximate $f(z)$ accurately.
 
@@ -138,11 +136,9 @@ The expected error-history plot  should show:
   $$\max_{z_i \in Z} \frac{|f(z_i) - r(z_i)|}{|f(z_i)|}$$
 
    decreases rapidly with $m$, reaching machine precision ($$\sim 10^{-16}$$).
-* Pole-capturing ability: The convergence speed far exceeds that of any polynomial approximation, indicating that AAA successfully places poles near those of $\tan(\pi z / 2)$.
+* Pole-capturing ability: The convergence speed far exceeds that of any polynomial approximation, indicating that AAA successfully places poles near those of $$tan(\pi z / 2).$$
 
 #### Experimental Visualization
-
-## Experimental Visualization
 
 To better illustrate the behavior and performance of the AAA algorithm, the following figures visualize the approximation of  
 
@@ -382,25 +378,28 @@ plt.figure(figsize=(7, 5))
 ---
 
 
-## Ⅴ. Summary, Limitations, and Possible Extensions
+#### Ⅴ. Conclusion
 
-#### Strengths
+The AAA algorithm demonstrates a powerful and adaptive framework for constructing rational approximations of complex functions.
+Through both simplified and advanced implementations, this study validates the algorithm’s theoretical advantages and numerical robustness.
 
-* Simplicity and Adaptivity: The core algorithm requires only ~40 lines of MATLAB code, with no need for user-specified degree or parameters.
-* Numerical Stability: The barycentric representation provides excellent stability for complex-domain problems.
-* Domain Flexibility: Works for irregular or disconnected sampling sets, even supporting analytic continuation in the complex plane.
+##### Achievements
 
-#### Limitations
+* Unified Theoretical and Numerical Insights:The rational barycentric form effectively combines interpolation theory with numerical linear algebra, transforming a nonlinear approximation problem into a sequence of stable linear least-squares subproblems.
+* High Accuracy and Stability:Experimental results confirm that AAA achieves exponential convergence and near machine precision within few iterations.The barycentric structure and adaptive point selection make it highly stable against round-off errors and ill-conditioning.
+* Effective Pole Handling:The algorithm naturally identifies and places poles close to the true singularities of the function $$f(z)=tan(πz/2)$$ , outperforming polynomial interpolation which fails near singularities due to the Runge phenomenon.
+* Demonstrated Practical Implementations:
+  * The first three figures illustrate the algebraic core of the algorithm and its educational value.
+  * The fourth and fifth figures further expand this foundation through cleansing the Frouissar bimodalities, residual analysis, and tolerance control, thereby enabling reliable large-scale applications.
 
-* Non-global optimality: Because of its greedy and linearized nature, AAA is heuristic and only guarantees local optimality—not the global minimax (Chebyshev) optimum.
-* Froissart doublets: May introduce spurious pole-zero pairs, requiring a cleanup stage.
-* Computational cost: Each iteration involves an SVD. For large $N$ and high $m$, total cost is roughly $O(N m^2 + m^3)$ or $O(N m^3)$, which can become expensive.
+#### Problem
+* Heuristic Nature:The greedy selection strategy yields locally optimal, but not globally minimax, approximations.
+* Computational Cost:The per-iteration SVD computation leads to $$O(Nm^{2})$$ to $$O(Nm^{3})$$ time complexity for large-scale data, making it computationally demanding for very large $$N.$$
+* Spurious Pole-Zero Pairs:The presence of Froissart doublets necessitates post-processing , which increases computational complexity.
 
-#### Possible Improvements and Extensions
+The AAA algorithm bridges the gap between numerical stability, analytical rigor, and computational efficiency in rational approximation.
+Its adaptability, compactness, and extensibility make it a cornerstone technique for future research in model reduction, system identification, and complex-domain analysis.
 
-* Minimax refinement: Use Lawson weighting or other optimization methods to refine the AAA result toward a global minimax solution.
-* Large-scale acceleration: Employ randomized SVD or sparse-matrix techniques for large datasets.
-* Symmetry preservation: For real-valued functions, enforce conjugate-symmetric support-point selection to ensure real-coefficient rational approximations.
 
 ---
 
