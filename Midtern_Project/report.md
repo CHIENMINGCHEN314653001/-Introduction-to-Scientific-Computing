@@ -1,0 +1,295 @@
+**Application of the AAA Algorithm in Rational Approximation**
+
+---
+
+**Ⅰ. Introduction 、 Problem Description and Motivataion**
+
+#### Background and Motivation
+
+In applied mathematics and engineering, rational approximation plays a crucial role. When approximating functions with singularities or highly oscillatory behavior, traditional polynomial-based methods (such as Chebyshev or Taylor expansions) often fail or require very high polynomial degrees. In contrast, rational approximations—ratios of two polynomials—can effectively capture singularities and asymptotic behavior.
+The AAA algorithm, proposed by Nakatsukasa, Sète, and Trefethen in 2017, aims to automatically construct accurate and numerically stable rational approximations. It combines concepts from model reduction, interpolation theory.
+
+#### Applications
+
+* Data Compression: Because rational functions can accurately express complex behavior using very few parameters, AAA is suitable for compressing large datasets or computational models into low-rank rational forms. A complex spectrum or function containing thousands of data points can be efficiently compressed into a rational model consisting of only a few dozen support points ($$z_j$$) , function values ​​($$f_j$$) , and weights ($$w_j$$) , thus achieving a compact, manageable, and mathematically expressible data form.
+* Control System Identification: In control engineering, system identification is a crucial step in building a mathematical model of the system from measured frequency-response data (FRD). AAA offers a more modern, faster, and more stable alternative than traditional methods such as Vector Fitting, VF, or RKFIT. By fitting the measured points to a high-fidelity rational function, AAA directly provides a stable system model that can be used for control design.
+* Model Order Reduction: In the simulation of complex dynamic systems (e.g., circuits, structural dynamics, fluid dynamics), high-order models are computationally extremely expensive. The AAA algorithm can effectively approximate the transfer function (or frequency response function) of a full-order system to a low-order rational model. Its adaptability ensures that the generated simplified model maintains high accuracy at key frequency points (such as resonant points), thereby bringing significant computational savings in simulation and controller design.
+* Analytic Continuation: In scientific computing and physics, it is often necessary to extend a complex function $$f(z)$$ known only on a finite region or discrete set of points to a larger complex domain. Since the rational function $$r(z)$$ constructed by AAA is analytic outside its poles, it naturally serves as an analytic continuation of $$f(z)$$. This capability is crucial for numerically analyzing the zeros and poles of the objective function in the extended domain.
+* Implementation in the Chebfun Toolbox: The AAA algorithm is the core of the aaa() function in the well-known MATLAB/Octave numerical computation toolbox Chebfun. This implementation highlights the robustness and ease of use of this algorithm. It allows users to perform high-precision rational approximations over the real or complex number domains (including irregular regions) without manually managing basis functions, pole locations, or iteration counts, greatly simplifying the complex approximation process.
+#### Problem Statement
+
+Given a complex (or real) function $$f(z)$$ sampled at discrete points
+$$Z = \{z_i\}_{i=1}^N$$ , 
+
+with corresponding values 
+$$F = \{f(z_i)\}_{i=1}^N$$
+, how can we construct a rational function
+
+$$
+r(z) = \frac{p(z)}{q(z)}
+$$
+
+that approximates $f$ with minimal error (in either uniform or least-squares sense)?
+
+#### Importance
+
+For functions with poles or branch cuts, polynomial approximations perform poorly, whereas rational functions can efficiently approximate such behaviors with lower degrees. Rational approximation forms the foundation of model reduction, frequency response fitting, analytic continuation, and data compression.
+
+---
+
+**Ⅱ. Method Overview – Core Ideas**
+
+The core idea of the AAA algorithm is to transform the nonlinear problem of rational approximation into a sequence of adaptive support-point selections and linear least-squares problems.
+
+#### Barycentric / Partial-Fraction Representation
+
+The AAA algorithm expresses the rational function $r(z)$ in barycentric form:
+
+$$
+r(z) = \frac{\sum_{j=1}^m \frac{w_j f_j}{z - z_j}}{\sum_{j=1}^m \frac{w_j}{z - z_j}} = \frac{p(z)}{q(z)}
+$$
+
+where $\{z_j\}_{j=1}^m$ are the selected support points, $f_j = f(z_j)$ are the corresponding function values, and $w_j$ are the weights.
+
+#### Advantages
+
+* This form defines a rational function $r(z)$ of type at most $(m-1, m-1).$
+* Because the basis functions $\frac{1}{(z - z_j)}$ are simple fractions, the barycentric form is numerically more stable than direct manipulation of polynomial coefficients.
+* Basis Function: Emphasizing the barycentric form of the basis function $\frac{1}{z-z_j}$, which has a simple pole structure.
+* Comparison of Runge Phenomenon: A brief comparison shows that polynomial interpolation (such as polynomial interpolation at equally spaced points) is prone to the Runge phenomenon, while AAA, through adaptive selection of interpolation points/support points and the use of fractional bases, fundamentally avoids instability on complex functions.
+* The difference from Padé approximation: Traditional Padé approximation requires calculating polynomial coefficients, which is numerically prone to ill-conditioned problems. The barycentric form of AAA effectively bypasses this problem.
+
+#### Interpolation Property
+
+In this representation, as $z \to z_j$, $r(z)$ has a removable singularity satisfying $r(z_j) = f_j$, ensuring exact interpolation at support points.
+
+#### Greedy Support Selection and Linearized Least-Squares
+
+The AAA algorithm is an adaptive iterative process, where each iteration $k$ adds one new support point until convergence tolerance is reached.
+
+**At iteration $$k$$:**
+
+* Greedy support selection: Choose the point $$z_k$$ with the largest residual $$|f(z_i) - r_{k-1}(z_i)|$$ as the new support point.
+
+* Residual linearization: For the remaining non-support points $$Z'$$, we want $$r_k(z_i) \approx f(z_i)$$, or equivalently,
+
+$$p(z_i) - f(z_i) q(z_i) \approx 0, \quad z_i \in Z'$$
+
+* Constructing the Loewner-like matrix: Define a Cauchy matrix $$C \in \mathbb{C}^{|Z'| \times k}$$ with elements $$C_{ij} = \frac{1}{(z_i - z_j)}$$. Then:
+
+$$p(z_i) = \sum_{j=1}^k \frac{w_j f_j}{z_i - z_j}, \quad q(z_i) = \sum_{j=1}^k \frac{w_j}{z_i - z_j}$$
+
+  The linearized condition becomes:
+
+$$A = \mathrm{diag}(F|_{Z'}) C - C \cdot \mathrm{diag}(\{f_j\}_{j=1}^k)$$
+
+  where $$A \in \mathbb{C}^{|Z'| \times k}$$ and $$(A\mathbf{w})_i = p(z_i) - f(z_i) q(z_i)$$.
+
+* SVD solution: Find $$\mathbf{w}$$ minimizing $$\|A\mathbf{w}\|_2$$ subject to $$\|\mathbf{w}\|_2 = 1$$. The optimal $$\mathbf{w}$$ is the right singular vector corresponding to the smallest singular value of $$A$$.
+
+* Update: Compute $$r_k(z) = \frac{p(z)}{q(z)}$$ using the new weights.
+
+* Stopping criterion: Stop when the maximum residual is below a relative tolerance (e.g., $$10^{-13}$$) or when $$m$$ reaches $$m_{max}$$
+
+#### Cleanup – Handling Froissart Doublets
+
+In practice, spurious pole-zero pairs with negligible residues may appear. These can harm stability and accuracy. The cleanup procedure checks the poles' residues and removes support points associated with negligible residues, then recomputes the least-squares solution to improve stability.
+
+---
+
+**Ⅲ. Simple Implementation**
+
+A compact implementation demonstrates the algebraic core of AAA:
+
+* Input: Sample points $$Z$$, values $$F$$, tolerance `tol`, and maximum steps `mmax`.
+* Core loop:
+  * Select the point with the largest residual as a new support point.
+  * Build the Cauchy and Loewner-like matrices.
+  * Perform SVD on $$A$$ and take the right singular vector of the smallest singular value as $$\mathbf{w}$$.
+  * Update $$r(z) = \frac{p(z)}{q(z)}.$$
+* Output: Returns a callable rational approximant `r_eval`, support points, weights, and the error history `errvec`.
+
+This version highlights the algebraic structure (Cauchy matrix, Loewner matrix, SVD) but omits full numerical robustness features.
+
+---
+
+**Ⅳ. Small Experiment**
+
+#### Objective and Setup
+
+We test the AAA algorithm on a function with infinitely many poles:
+
+$$
+f(z) = \tan\left(\frac{\pi z}{2}\right)
+$$
+
+using sample points $Z$ distributed along a spiral in the complex plane. Because $f(z)$ has periodic poles, it represents a case where polynomial approximations perform poorly, but rational approximations excel.
+
+#### Experimental Significance
+
+The goal is to verify whether AAA can automatically and efficiently place support points and weights near poles to approximate $f(z)$ accurately.
+
+#### Expected Results
+
+After running `aaa_simple.py`, the expected error-history plot (`demo_aaa.png`) should show:
+
+* Rapid, exponential convergence: The maximum relative error
+
+  $$\max_{z_i \in Z} \frac{|f(z_i) - r(z_i)|}{|f(z_i)|}$$
+
+   decreases rapidly with $m$, reaching machine precision ($$\sim 10^{-16}$$).
+* Pole-capturing ability: The convergence speed far exceeds that of any polynomial approximation, indicating that AAA successfully places poles near those of $\tan(\pi z / 2)$.
+
+#### Experimental Visualization
+
+## Experimental Visualization
+
+To better illustrate the behavior and performance of the AAA algorithm, the following figures visualize the approximation of  
+
+$$f(z) = \tan\left(\frac{\pi z}{2}\right)$$
+
+using the compact Python implementation.
+
+---
+
+##### Figure 1
+<div style="display: flex; align-items: center;">
+  <div style="flex: 50%;">
+    <img src="figure1.png" alt="Figure 1: Supports, Poles, and Zeros" width="100%">
+  </div>
+  <div style="flex: 50%; padding-left: 20px;">
+    <p>This plot shows the distribution of <b>sample points</b>, <b>support points</b>, and the <b>estimated poles and zeros</b> of the rational approximant.</p>
+    <ul>
+      <li>Gray dots: Sampling points $$Z$$</li>
+      <li>Red crosses (×): Support points selected by AAA</li>
+      <li>Black crosses (×): Poles of the rational approximation</li>
+      <li>Blue circles (○): Zeros of the rational approximation</li>
+      <li>Orange plus (+): True poles of $$tan(\pi z / 2) $$ at $$z = \pm1, \pm3, \dots$$</li>
+    </ul>
+    <p> <b>This figure demonstrates that AAA automatically places support points and poles near the function’s singularities.</b></p>
+  </div>
+</div>
+```python
+plt.figure(figsize=(16, 7))
+ax1 = plt.subplot(1, 2, 1)
+ax1.set_title("AAA Analysis: Supports, Poles, and Zeros", fontsize=14)
+ax1.scatter(Z.real, Z.imag, s=5, alpha=0.5, c='#8c92ac', label='Samples')
+if z_sup.size > 0:
+    ax1.scatter(z_sup.real, z_sup.imag, s=80, c='red', marker='x', label='Supports', linewidths=2)
+finite_poles = poles[np.isfinite(poles) & (np.abs(poles) < 100)]
+finite_zeros = zeros[np.isfinite(zeros) & (np.abs(zeros) < 100)]
+if finite_poles.size > 0:
+    ax1.scatter(finite_poles.real, finite_poles.imag, s=100, c='black', marker='x', label='Poles', linewidths=1.5)
+if finite_zeros.size > 0:
+    ax1.scatter(finite_zeros.real, finite_zeros.imag, s=50, marker='o', facecolors='none', edgecolors='blue', label='Zeros')
+true_poles = np.array([-1, 1, -3, 3])
+ax1.scatter(true_poles, np.zeros_like(true_poles), s=150, facecolors='none', edgecolors='orange', marker='+', label='True Poles (±1, ±3)')
+ax1.legend(loc='upper right', fontsize=10)
+ax1.set_xlabel('Re(z)'); ax1.set_ylabel('Im(z)')
+ax1.axis('equal')
+ax1.set_xlim([-1.6, 1.6]); ax1.set_ylim([-1.6, 1.6])
+```
+---
+
+##### Figure 2
+
+<div style="display: flex; align-items: center;">
+  <div style="flex: 50%;">
+    <img src="figure2.png" alt="Figure 2: Error Heatmap" width="100%">
+  </div>
+  <div style="flex: 50%; padding-left: 20px;">
+    <p>This figure shows a logarithmic-scale heatmap of the absolute error $$|f(z) - r(z)|$$ over the complex plane.</p>
+    <ul>
+      <li>Dark blue areas: Low error (good approximation)</li>
+      <li>Yellow/green areas: Higher error near poles</li>
+      <li>Color scale: Logarithmic, accuracy down to machine precision</li>
+    </ul>
+    <p> <b>The AAA approximation maintains near-machine accuracy away from singularities, confirming its numerical robustness.</b></p>
+  </div>
+</div>
+```python
+ax2 = plt.subplot(1, 2, 2)
+ax2.set_title('Absolute Error |f(z) - r(z)| on Grid (Log Scale)', fontsize=14)
+nx, ny = 200, 200
+xr, yr = np.linspace(-1.6, 1.6, nx), np.linspace(-1.6, 1.6, ny)
+X, Y = np.meshgrid(xr, yr)
+grid = (X + 1j * Y).ravel()
+true_vals = np.tan(np.pi * grid / 2)
+approx_vals = r(grid)
+err = np.abs(true_vals - approx_vals)
+err[np.abs(true_vals) > 1e10] = np.nan
+err2d = err.reshape((ny, nx))
+vmin = max(AAA_TOL, 1e-300)
+finite_mask = np.isfinite(err2d)
+vmax = np.nanmax(err2d[finite_mask]) if np.any(finite_mask) else vmin
+cf = ax2.pcolormesh(X, Y, err2d, shading='auto',
+                    norm=mcolors.LogNorm(vmin=vmin, vmax=max(vmax, vmin)),
+                    cmap='viridis')
+plt.colorbar(cf, ax=ax2, label='|f - r|')
+ax2.set_xlabel('Re(z)'); ax2.set_ylabel('Im(z)')
+ax2.axis('equal')
+ax2.set_xlim([-1.6, 1.6]); ax2.set_ylim([-1.6, 1.6])
+plt.tight_layout()
+plt.show()
+```
+---
+
+##### Figure 3
+
+<div style="display: flex; align-items: center;">
+  <div style="flex: 50%;">
+    <img src="figure3.png" alt="Figure 3: Error History" width="100%">
+  </div>
+  <div style="flex: 50%; padding-left: 20px;">
+    <p>This semilog plot shows the maximum residual $$max |f(z_i) - r(z_i)|$$ versus the number of AAA iterations.</p>
+    <ul>
+      <li>Teal line: Maximum residual per iteration</li>
+      <li>Red dashed line: Specified tolerance threshold</li>
+    </ul>
+    <p><b>The residual decreases exponentially, demonstrating fast convergence and high accuracy of the AAA approximation.</b></p>
+  </div>
+</div>
+```python
+plt.figure(figsize=(8, 4.5))
+if errvec.size > 0:
+    plt.semilogy(np.arange(1, len(errvec) + 1), np.maximum(errvec, 1e-300),
+                 marker='o', linestyle='-', color='teal', label='Max Residual')
+    plt.axhline(AAA_TOL * max_F_abs, color='red', linestyle='--', label='Tolerance Limit')
+    plt.xlabel('AAA Step (m, Support Points)')
+    plt.ylabel('Max Sample Error |f - r|')
+    plt.title(f'Error History: Exponential Convergence to {AAA_TOL:0.0e}', fontsize=14)
+    plt.legend()
+    plt.grid(True, which="both", ls="--", alpha=0.6)
+plt.show()
+```
+---
+
+## Ⅴ. Summary, Limitations, and Possible Extensions
+
+#### Strengths
+
+* Simplicity and Adaptivity: The core algorithm requires only ~40 lines of MATLAB code, with no need for user-specified degree or parameters.
+* Numerical Stability: The barycentric representation provides excellent stability for complex-domain problems.
+* Domain Flexibility: Works for irregular or disconnected sampling sets, even supporting analytic continuation in the complex plane.
+
+#### Limitations
+
+* Non-global optimality: Because of its greedy and linearized nature, AAA is heuristic and only guarantees local optimality—not the global minimax (Chebyshev) optimum.
+* Froissart doublets: May introduce spurious pole-zero pairs, requiring a cleanup stage.
+* Computational cost: Each iteration involves an SVD. For large $N$ and high $m$, total cost is roughly $O(N m^2 + m^3)$ or $O(N m^3)$, which can become expensive.
+
+#### Possible Improvements and Extensions
+
+* Minimax refinement: Use Lawson weighting or other optimization methods to refine the AAA result toward a global minimax solution.
+* Large-scale acceleration: Employ randomized SVD or sparse-matrix techniques for large datasets.
+* Symmetry preservation: For real-valued functions, enforce conjugate-symmetric support-point selection to ensure real-coefficient rational approximations.
+
+---
+
+**Ⅵ. Reference**
+
+Nakatsukasa, Y., Sète, O., and Trefethen, L. N., *"The AAA algorithm for rational approximation"*, arXiv:1612.00337v2 (2017).
+
+---
+**Programing**
+link:https://colab.research.google.com/drive/1Pt3DuwMfc9mTfKGdq4NsKjE9YsluR4bE?usp=sharing
