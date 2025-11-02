@@ -131,7 +131,7 @@ The goal is to verify whether AAA can automatically and efficiently place suppor
 
 #### Expected Results
 
-After running `aaa_simple.py`, the expected error-history plot (`demo_aaa.png`) should show:
+The expected error-history plot  should show:
 
 * Rapid, exponential convergence: The maximum relative error
 
@@ -153,22 +153,27 @@ using the compact Python implementation.
 ---
 
 ##### Figure 1
-<div style="display: flex; align-items: center;">
-  <div style="flex: 50%;">
-    <img src="figure1.png" alt="Figure 1: Supports, Poles, and Zeros" width="100%">
-  </div>
-  <div style="flex: 50%; padding-left: 20px;">
-    <p>This plot shows the distribution of <b>sample points</b>, <b>support points</b>, and the <b>estimated poles and zeros</b> of the rational approximant.</p>
-    <ul>
-      <li>Gray dots: Sampling points $$Z$$</li>
-      <li>Red crosses (×): Support points selected by AAA</li>
-      <li>Black crosses (×): Poles of the rational approximation</li>
-      <li>Blue circles (○): Zeros of the rational approximation</li>
-      <li>Orange plus (+): True poles of $$tan(\pi z / 2) $$ at $$z = \pm1, \pm3, \dots$$</li>
-    </ul>
-    <p> <b>This figure demonstrates that AAA automatically places support points and poles near the function’s singularities.</b></p>
-  </div>
-</div>
+<table>
+<tr>
+<td style="width:50%; vertical-align:middle;">
+  <img src="Figure1.png" alt="Figure 1: Supports, Poles, and Zeros" width="100%">
+</td>
+<td style="width:50%; vertical-align:top; padding-left:15px;">
+
+This plot shows the distribution of sample points, selected support points, and the estimated poles and zeros of the rational approximant in the complex plane.
+
+* Gray dots: Sampling points $$Z$$
+* Red crosses (×): Support points selected by AAA  
+* Black crosses (×): Poles of the rational approximation  
+* Blue circles (○): Zeros of the rational approximation  
+* Orange plus (+): True poles of $$tan(\pi z / 2)$$ at $$z = \pm1, \pm3, \dots$$
+
+This figure demonstrates that AAA automatically places support points and poles near the function’s singularities.
+
+</td>
+</tr>
+</table>
+
 ```python
 plt.figure(figsize=(16, 7))
 ax1 = plt.subplot(1, 2, 1)
@@ -193,20 +198,29 @@ ax1.set_xlim([-1.6, 1.6]); ax1.set_ylim([-1.6, 1.6])
 
 ##### Figure 2
 
-<div style="display: flex; align-items: center;">
-  <div style="flex: 50%;">
-    <img src="figure2.png" alt="Figure 2: Error Heatmap" width="100%">
-  </div>
-  <div style="flex: 50%; padding-left: 20px;">
-    <p>This figure shows a logarithmic-scale heatmap of the absolute error $$|f(z) - r(z)|$$ over the complex plane.</p>
-    <ul>
-      <li>Dark blue areas: Low error (good approximation)</li>
-      <li>Yellow/green areas: Higher error near poles</li>
-      <li>Color scale: Logarithmic, accuracy down to machine precision</li>
-    </ul>
-    <p> <b>The AAA approximation maintains near-machine accuracy away from singularities, confirming its numerical robustness.</b></p>
-  </div>
-</div>
+<table>
+<tr>
+<td style="width:50%; vertical-align:middle;">
+  <img src="Figure2.png" alt="Figure 2: Error Heatmap" width="100%">
+</td>
+<td style="width:50%; vertical-align:top; padding-left:15px;">
+
+A logarithmic-scale heatmap of the absolute error  
+
+ $$\quad\quad\quad\quad\quad\quad\quad|f(z) - r(z)|$$
+
+over a rectangular grid in the complex plane.
+
+* Dark blue areas represent low error.  
+* Yellow/green regions near poles indicate higher error.  
+* The color scale is logarithmic, showing accuracy down to machine precision.
+
+The AAA approximation maintains near-machine accuracy away from singularities, confirming its numerical robustness.
+
+</td>
+</tr>
+</table>
+
 ```python
 ax2 = plt.subplot(1, 2, 2)
 ax2.set_title('Absolute Error |f(z) - r(z)| on Grid (Log Scale)', fontsize=14)
@@ -236,19 +250,28 @@ plt.show()
 
 ##### Figure 3
 
-<div style="display: flex; align-items: center;">
-  <div style="flex: 50%;">
-    <img src="figure3.png" alt="Figure 3: Error History" width="100%">
-  </div>
-  <div style="flex: 50%; padding-left: 20px;">
-    <p>This semilog plot shows the maximum residual $$max |f(z_i) - r(z_i)|$$ versus the number of AAA iterations.</p>
-    <ul>
-      <li>Teal line: Maximum residual per iteration</li>
-      <li>Red dashed line: Specified tolerance threshold</li>
-    </ul>
-    <p><b>The residual decreases exponentially, demonstrating fast convergence and high accuracy of the AAA approximation.</b></p>
-  </div>
-</div>
+<table>
+<tr>
+<td style="width:50%; vertical-align:middle;">
+  <img src="Figure3.png" alt="Figure 3: Error History and Convergence" width="100%">
+</td>
+<td style="width:50%; vertical-align:top; padding-left:15px;">
+
+This semilog plot shows the maximum residual
+
+$$max |f(z_i) - r(z_i)|$$
+
+versus the number of AAA iterations (support points).
+
+* Teal line: Maximum residual per iteration  
+* Red dashed line: Specified tolerance threshold  
+
+The residual decreases exponentially, demonstrating fast convergence and high accuracy of the AAA approximation.
+
+</td>
+</tr>
+</table>
+
 ```python
 plt.figure(figsize=(8, 4.5))
 if errvec.size > 0:
@@ -263,6 +286,101 @@ if errvec.size > 0:
 plt.show()
 ```
 ---
+##### Visualization
+
+Visualize its convergence behavior and the resulting rational approximation of  
+
+$$f(z) = \tan\left(\frac{\pi z}{2}\right)$$
+
+along the complex line $$z = t + 0.1j t.$$
+
+---
+##### Figure4
+<table>
+<tr>
+<td width="48%">
+    <img src="Figure4.png" width="100%" alt="AAA Convergence History">
+</td>
+<td width="52%" valign="top">
+
+This figure shows the evolution of the maximum residual
+
+$$max |f(z_i) - r(z_i)|$$
+
+on a semilogarithmic scale during successive iterations of the AAA algorithm.
+
+* Each iteration adds one new support point at the location of maximum error.
+* The residual decreases exponentially, often reaching machine precision ($$~10^{-14}$$) within a few dozen steps.
+* The final plateau indicates convergence within the tolerance $$tol=1e-12.$$
+
+AAA exhibits fast, stable, and adaptive convergence, achieving high precision with very few support points.
+
+</td>
+</tr>
+</table>
+
+```python
+M = 300
+    t = np.linspace(-1.5, 1.5, M)
+    Z = t + 0.1j * t  # Complex sampling line
+    F = np.tan(np.pi * Z / 2)
+
+    out = aaa(Z, F, tol=1e-12, mmax=80)
+    r = out["r_eval"]
+
+    # Plot convergence
+    plt.figure(figsize=(8, 4.5))
+    plt.semilogy(np.maximum(out["errvec"], 1e-16), marker="o", color="teal")
+    plt.title("AAA Convergence History (Advanced Version)")
+    plt.xlabel("Iteration (Support Points)")
+    plt.ylabel("Max |f - r|")
+    plt.grid(True, which="both", ls="--", alpha=0.7)
+    plt.show()
+```
+
+---
+##### Figure5
+<table>
+<tr>
+<td width="48%">
+    <img src="Figure5.png" width="100%" alt="AAA Approximation of tan(pi*z/2)">
+</td>
+<td width="52%" valign="top">
+
+
+
+This plot compares the original function $$f(z)$$ (solid blue line)  
+with its AAA rational approximation $$r(z)$$ (orange dashed line) along the real axis.
+
+* The two curves almost perfectly overlap, confirming high approximation accuracy.
+* Near the true poles $$z = \pm1, \pm3, \dots$$, the rational function captures the singular behavior smoothly.
+* Unlike polynomial interpolation, AAA avoids the Runge phenomenon and remains stable near singularities.
+
+Conclusion:  
+The advanced AAA implementation effectively approximates functions with poles,demonstrating the power of rational approximation in complex-domain analysis.
+
+</td>
+</tr>
+</table>
+
+```python
+M = 300
+    t = np.linspace(-1.5, 1.5, M)
+    Z = t + 0.1j * t  # Complex sampling line
+    F = np.tan(np.pi * Z / 2)
+
+    out = aaa(Z, F, tol=1e-12, mmax=80)
+    r = out["r_eval"]
+plt.figure(figsize=(7, 5))
+    plt.plot(t, F.real, label="Re(f)")
+    plt.plot(t, r(t).real, "--", label="Re(r)")
+    plt.legend()
+    plt.title("AAA Approximation of f(z)=tan(pi*z/2)")
+    plt.show()
+```
+
+---
+
 
 ## Ⅴ. Summary, Limitations, and Possible Extensions
 
@@ -292,4 +410,6 @@ Nakatsukasa, Y., Sète, O., and Trefethen, L. N., *"The AAA algorithm for ration
 
 ---
 **Programing**
+
 link:https://colab.research.google.com/drive/1Pt3DuwMfc9mTfKGdq4NsKjE9YsluR4bE?usp=sharing
+link:https://colab.research.google.com/drive/1hvgn3vW1bxzw3rqvuTN4bNZZDMY8Qh82?usp=sharing
