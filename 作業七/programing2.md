@@ -69,7 +69,7 @@ The scheme should demonstrate second-order accuracy.
     plt.show()
 ```
 
-![figure67(圖七.jpg)
+![figure7](圖七.jpg)
 
 <div align = "center">
   | Grid Points (n) | Max Difference $$|u_h - u_{2h}\|$$  | Estimated Rate |
