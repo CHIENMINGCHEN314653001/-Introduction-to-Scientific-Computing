@@ -69,7 +69,7 @@ The scheme should demonstrate second-order accuracy.
     plt.show()
 ```
 
-![figure5](圖五.jpg)
+![figure5](圖六.jpg)
 
 <div align = "center">
   | Grid Points (n) | Max Difference $$|u_h - u_{2h}\|$$  | Estimated Rate |
@@ -105,7 +105,7 @@ Average rate: $$≈ 2.0$$ → confirms $$O(h^2)$$ accuracy.
     plt.show()
 ```
 
-![figure6](圖六.jpg)
+![figure6](圖七.jpg)
 
 The nonlinear boundary value problem
 
