@@ -119,10 +119,3 @@ The method exhibits second-order accuracy and excellent convergence behavior.
 <br></br>
 **Programing**
 link:https://colab.research.google.com/drive/1iIy7KfKVYhhcj5CRgz3fUl3NsXzGwzZo?usp=sharing
-
-|Grid Points (n)| Max Difference $$u_h - u_{2h}$$ | Estimated Rate|
-|:---:|:---:|:---:|
-| $$40 → 80$$ | $$≈ 1e-4$$ | - |
-| $$80 → 160$$ | $$≈ 2.5e-5$$ | $$≈ 2.0$$ |
-| $$160 → 320$$ | $$≈ 6e-6$$ | $$≈ 2.0$$ |
-| $$320 → 640$$ | $$≈ 1.5e-6$$ | $$≈ 2.0$$ |
