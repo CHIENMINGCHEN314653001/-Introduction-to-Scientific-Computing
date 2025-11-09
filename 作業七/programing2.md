@@ -71,13 +71,13 @@ The scheme should demonstrate second-order accuracy.
 
 ![figure7](圖七.jpg)
 
-<div align = "center">
-  | Grid Points (n) | Max Difference $$|u_h - u_{2h}\|$$  | Estimated Rate |
-  |:---:|:---:|:---:|
-  | $$40 → 80$$     | $$≈ 1e-4$$    |     —      |
-  | $$80 → 160$$    | $$≈ 2.5e-5$$  | $$≈ 2.0$$  |
-  | $$160 → 320$$   | $$≈ 6e-6$$    | $$≈ 2.0$$  |
-  | $$320 → 640$$   | $$≈ 1.5e-6$$  | $$≈ 2.0$$  |
+<div  align = "center">
+  | Grid Points (n) | Max Difference $$|u_h - u_{2h}|$$  | Estimated Rate |
+  |:---:|:---:|:---:|:---:|
+  | $$40 → 80$$ | $$≈ 1e-4$$ |
+  | $$80 → 160$$ | $$≈ 2.5e-5$$ | $$≈ 2.0$$ |
+  | $$160 → 320$$ | $$≈ 6e-6$$ | $$≈ 2.0$$ |
+  | $$320 → 640$$ | $$≈ 1.5e-6$$ | $$≈ 2.0$$ |
 </div>
 
 Average rate: $$≈ 2.0$$ → confirms $$O(h^2)$$ accuracy.
