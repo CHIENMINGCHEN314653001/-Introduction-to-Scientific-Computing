@@ -25,17 +25,17 @@ $$u(x)=\int_0^1 G(x,t)e^{\sin t}\,dt.$$
 
 This is used to compute a high-accuracy reference solution through composite Gauss–Legendre quadrature.
 
-
+<br></br>
 **Numerical Methods**
 
 * FD2 Scheme — Second-Order Accuracy
 A standard centered finite-difference discretization:
 
 $$
--\frac{u_{j-1}-2u_j+u_{j+1}}{h^2} = f(x_j), \quad u_0=u_n=0,
+-\frac{u_{j-1}-2u_j+u_{j+1}}{h^2} = f(x_j), \quad u_0=u_n=0
 $$
 
-leads to a tridiagonal system $$A u = h^2 f$$ , where $$A$$ is symmetric and strictly diagonally dominant.
+$$\quad$$ $$\quad$$ leads to a tridiagonal system $$A u = h^2 f$$ , where $$A$$ is symmetric and strictly diagonally dominant.
 
 * FD4 Scheme — Fourth-Order Accuracy (Modified)
 For higher accuracy, a 5-point stencil is used in the interior:
@@ -44,7 +44,7 @@ $$
 -\frac{-u_{j-2}+16u_{j-1}-30u_j+16u_{j+1}-u_{j+2}}{12h^2} = f(x_j),
 $$
 
-and one-sided 4th-order formulas near the boundaries to eliminate dependence on ghost points:
+$$\quad$$ $$\quad$$ and one-sided 4th-order formulas near the boundaries to eliminate dependence on ghost points:
 
 $$
 \begin{aligned}
@@ -53,8 +53,7 @@ $$
 \end{aligned}
 $$
 
-
-
+<br></br>
 **Experiment**
 
 * Reference Solution: Computed with composite Gauss–Legendre quadrature using 8 points per subinterval and 300 panels.  
@@ -62,7 +61,7 @@ $$
 * Error Metric: Maximum norm error, $$|u_h - u_{\text{ref}}\|_\infty.$$
 
 
-
+<br></br>
 **Results**
 ```python
 # Plot convergence
@@ -104,7 +103,7 @@ The FD4 scheme shows faster convergence and lower absolute error until the error
 
 ![figure5](圖五.jpg)
 
----
+<br></br>
 
 **Accuracy Limitation**
 
@@ -120,7 +119,7 @@ Balancing these terms gives the optimal grid size $$h_{\text{opt}}\sim \varepsil
 For double precision, $$h_{\text{opt}}\approx 10^{-4}$$ , corresponding to a minimal achievable error around $$10^{-8}.$$  
 
 
-
+<br></br>
 
 **Conclusion**
 
@@ -128,6 +127,6 @@ For double precision, $$h_{\text{opt}}\approx 10^{-4}$$ , corresponding to a min
 * Numerical precision limits the smallest achievable error to about $$10^{-8}.$$  
 * Proper boundary treatment is critical for realizing high-order convergence in finite-difference schemes.
 
-
+<br></br>
 **Programing**
 link:https://colab.research.google.com/drive/1JGj0miG1kUZu5jqyDBwI7XPNOj5Mt7hx?usp=sharing
