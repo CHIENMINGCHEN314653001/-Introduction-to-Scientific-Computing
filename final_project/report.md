@@ -398,6 +398,180 @@ The Amber function test (Figs. 3–4)
 
 The authors construct an "Amber function" $$A(x)$$ whose coefficients are determined by the binary digits of $$\pi$$. It is analytic inside a Bernstein 2-ellipse but has essentially no exploitable structure.
 
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import lstsq
+import warnings
+from matplotlib.colors import LogNorm
+
+warnings.filterwarnings('ignore')
+
+
+def aaa(Z, F, tol=1e-13, mmax=100):
+    """ AAA 演算法實作 """
+    Z = np.asanyarray(Z)
+    F = np.asanyarray(F)
+    mask = np.isfinite(F)
+    Z, F = Z[mask], F[mask]
+    
+    J = []
+    z = []
+    f = []
+    C = []
+    R = np.mean(F) * np.ones_like(F)
+    
+    for m in range(mmax):
+        err = F - R
+        j = np.argmax(np.abs(err))
+        max_err = np.abs(err[j])
+        if max_err <= tol * np.linalg.norm(F, np.inf):
+            break
+            
+        J.append(j)
+        z.append(Z[j])
+        f.append(F[j])
+        
+        with np.errstate(divide='ignore', invalid='ignore'):
+            current_C = 1.0 / (Z - Z[j])
+        current_C[j] = 0
+        C.append(current_C)
+        
+        m_curr = len(z)
+        A = np.zeros((len(Z), m_curr), dtype=complex)
+        for i in range(m_curr):
+            with np.errstate(divide='ignore', invalid='ignore'):
+                col = (F - f[i]) / (Z - z[i])
+            col[J] = 0
+            A[:, i] = col
+            
+        mask_J = np.ones(len(Z), dtype=bool)
+        mask_J[J] = False
+        A_reduced = A[mask_J, :]
+        
+        if A_reduced.shape[0] < A_reduced.shape[1]: break
+            
+        try:
+            U, S, Vh = np.linalg.svd(A_reduced)
+            w = Vh[-1, :].conj()
+        except: break
+
+        def r_handle(zz):
+            zz = np.asanyarray(zz)
+            num = np.zeros_like(zz, dtype=complex)
+            den = np.zeros_like(zz, dtype=complex)
+            for i in range(len(w)):
+                with np.errstate(divide='ignore', invalid='ignore'):
+                    term = w[i] / (zz - z[i])
+                term[np.isinf(term)] = 0
+                num += term * f[i]
+                den += term
+            with np.errstate(divide='ignore', invalid='ignore'):
+                res = num / den
+            for i, idx in enumerate(J):
+                mask_close = np.isclose(zz, z[i], atol=1e-13)
+                if np.any(mask_close):
+                    res[mask_close] = f[i]
+            return res
+            
+        R = r_handle(Z)
+    return locals().get('r_handle', lambda x: np.mean(F) * np.ones_like(x))
+
+def floater_hormann(x_eval, x_nodes, y_nodes, d=3):
+    """ Floater-Hormann 插值實作 """
+    n = len(x_nodes)
+    d = min(d, n - 1)
+    w = np.zeros(n)
+    for k in range(n):
+        s = 0.0
+        i_min = max(0, k - d)
+        i_max = min(n - 1 - d, k)
+        for i in range(i_min, i_max + 1):
+            prod = 1.0
+            for j in range(i, i + d + 1):
+                if j != k: prod *= 1.0 / np.abs(x_nodes[k] - x_nodes[j])
+            if (i % 2) == 1: s -= prod
+            else: s += prod
+        w[k] = (-1.0)**k * s
+
+    num = np.zeros_like(x_eval)
+    den = np.zeros_like(x_eval)
+    for k in range(n):
+        with np.errstate(divide='ignore'):
+            term = w[k] / (x_eval - x_nodes[k])
+        mask_inf = np.isinf(term)
+        term[mask_inf] = 0
+        num += term * y_nodes[k]
+        den += term
+        
+    with np.errstate(divide='ignore', invalid='ignore'):
+        res = num / den
+    for k in range(n):
+        mask_hit = np.isclose(x_eval, x_nodes[k], atol=1e-14)
+        if np.any(mask_hit): res[mask_hit] = y_nodes[k]
+    return res
+
+
+def get_amber_coeffs(n_terms=60):
+    np.random.seed(314159) 
+    s = np.random.choice([1, -1], size=n_terms)
+    c = np.array([s[k] * 2.0**(-k) for k in range(n_terms)])
+    return c
+
+def amber_eval(x, coeffs):
+    return np.polynomial.chebyshev.chebval(x, coeffs)
+
+coeffs = get_amber_coeffs()
+xx = np.linspace(-1, 1, 1000)
+f_amber = lambda x: amber_eval(x, coeffs)
+true_vals_amber = f_amber(xx)
+
+n_values = np.arange(10, 201, 10) 
+err_aaa_amber = []
+err_floater_amber = []
+err_poly_amber = []
+
+for n in n_values:
+    X = np.linspace(-1, 1, n)
+    F = f_amber(X)
+    
+    # 1. AAA
+    try:
+        r = aaa(X, F, tol=1e-13)
+        vals = np.real(r(xx))
+        err_aaa_amber.append(np.linalg.norm(true_vals_amber - vals, np.inf))
+    except: err_aaa_amber.append(np.nan)
+
+    # 2. Floater-Hormann
+    try:
+        vals = floater_hormann(xx, X, F, d=3)
+        err_floater_amber.append(np.linalg.norm(true_vals_amber - vals, np.inf))
+    except: err_floater_amber.append(np.nan)
+    
+    # 3. Poly Least-Squares
+    try:
+        deg = int(n / 2)
+        T_mat = np.polynomial.chebyshev.chebvander(X, deg)
+        c, _, _, _ = lstsq(T_mat, F, lapack_driver='gelsy')
+        T_eval = np.polynomial.chebyshev.chebvander(xx, deg)
+        vals = T_eval @ c
+        err_poly_amber.append(np.linalg.norm(true_vals_amber - vals, np.inf))
+    except: err_poly_amber.append(np.nan)
+
+plt.figure(figsize=(10, 5))
+plt.semilogy(n_values, err_poly_amber, '.-', color='orange', label='Poly Least-Squares')
+plt.semilogy(n_values, err_floater_amber, '.-', color='green', label="Floater-Hormann")
+plt.semilogy(n_values, err_aaa_amber, 'k.-', label='AAA')
+plt.title(r'Fig 4: Convergence on Amber Function $A(x)$')
+plt.xlabel('n (samples)')
+plt.ylabel('Max Error')
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.show()
+
+```
+![figure](figure4.jpg)
+
 Result: For this nearly non-rational function, AAA does not outperform the Floater–Hormann method.
 
 AAA’s advantage lies in its ability to exploit analytic structure. AAA is a nonlinear method. Unlike linear schemes that always use all $$n$$ degrees of freedom, AAA automatically stops increasing the rational degree once the target accuracy is reached—effectively choosing an optimal oversampling rate. The paper reveals an unexpected phenomenon: the stability of Fourier extensions arises from the use of an ill-conditioned basis (complex exponentials $$e^{i\pi kx/2}$$) combined with floating-point roundoff. These roundoff errors limit the growth of the condition number and thus accidentally stabilize the computation.
@@ -408,6 +582,41 @@ If a well-conditioned basis (e.g., Arnoldi) is used instead, Fourier extensions 
 **Discussion**
 
 Analytic continuation: AAA not only provides high accuracy on $$[-1,1]$$ but also yields excellent analytic continuation into the complex plane (Fig. 8).
+
+```python
+def f_demo(z):
+    return np.exp(z) / np.sqrt(1 + 9*z**2)
+
+
+n_demo = 50
+Z_demo = np.linspace(-1, 1, n_demo)
+F_demo = f_demo(Z_demo)
+r_demo = aaa(Z_demo, F_demo)
+x_grid = np.linspace(-2, 2, 400)
+y_grid = np.linspace(-2, 2, 400)
+X_g, Y_g = np.meshgrid(x_grid, y_grid)
+Z_grid = X_g + 1j * Y_g
+
+
+Exact_grid = f_demo(Z_grid)
+Approx_grid = r_demo(Z_grid)
+Error_grid = np.abs(Exact_grid - Approx_grid)
+
+
+plt.figure(figsize=(9, 7))
+levels = [1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e0]
+cp = plt.contour(X_g, Y_g, Error_grid, levels=levels, norm=LogNorm(), cmap='viridis')
+plt.colorbar(cp, label='Error magnitude')
+plt.plot(Z_demo, np.zeros_like(Z_demo), 'r.', markersize=3, label='Sample points [-1, 1]')
+plt.plot([0, 0], [1/3, -1/3], 'kx', markersize=10, markeredgewidth=2, label='True Singularities')
+plt.title('Fig 8: AAA Analytic Continuation (Error Contours)')
+plt.xlabel('Re(z)')
+plt.ylabel('Im(z)')
+plt.legend(loc='lower right')
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+![figure](figure5.jpg)
 
 Missing data: AAA can handle equispaced grids with missing values.
 
@@ -427,3 +636,8 @@ r(x) = \frac{p(x)}{q(x)},
 $$
 
 combined with a nonlinear, adaptive algorithm, achieves a breakthrough in the classical problem of interpolation on equispaced grids.
+
+<br></br>
+**Programing**
+
+Link:https://colab.research.google.com/drive/1-PGSjd8yYPAOhu8xkHNrHAOpCg9G0HyH?usp=sharing
