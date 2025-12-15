@@ -5,7 +5,9 @@ Consider the boundary value problem:
 
 $$- u''(x) = e^{\sin x}, \quad 0 < x < 1, \quad u(0)=u(1)=0.$$
 
----
+<br></br>
+
+**Sol:**
 
 **Analytical Representation**
 
