@@ -8,7 +8,9 @@ $$
 
 Solving the problem numerically and check the accuracy of the solution.
 
----
+<br></br>
+
+**Sol:**
 
 **Method**
 
