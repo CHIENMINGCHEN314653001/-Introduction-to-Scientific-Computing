@@ -100,6 +100,279 @@ AAA is compared with the five methods above using the following five test functi
 
 Main results (Fig. 2)
 
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
+from scipy.linalg import lstsq
+import warnings
+import sys
+
+
+warnings.filterwarnings('ignore')
+
+
+def aaa(Z, F, tol=1e-13, mmax=100):
+    Z = np.asanyarray(Z)
+    F = np.asanyarray(F)
+    mask = np.isfinite(F)
+    Z, F = Z[mask], F[mask]
+    J = []  
+    z = []  
+    f = []  
+    C = []  
+    R = np.mean(F) * np.ones_like(F)
+    
+    for m in range(mmax):
+        err = F - R
+        j = np.argmax(np.abs(err))
+        max_err = np.abs(err[j])
+        if max_err <= tol * np.linalg.norm(F, np.inf):
+            break
+            
+        J.append(j)
+        z.append(Z[j])
+        f.append(F[j])
+        
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            current_C = 1.0 / (Z - Z[j])
+        current_C[j] = 0
+        C.append(current_C)
+        m_curr = len(z)
+        A = np.zeros((len(Z), m_curr), dtype=complex)
+        for i in range(m_curr):
+            with np.errstate(divide='ignore', invalid='ignore'):
+                col = (F - f[i]) / (Z - z[i])
+            col[J] = 0 
+            A[:, i] = col
+
+        mask_J = np.ones(len(Z), dtype=bool)
+        mask_J[J] = False
+        A_reduced = A[mask_J, :]
+        
+        if A_reduced.shape[0] < A_reduced.shape[1]:
+             break 
+
+        try:
+            U, S, Vh = np.linalg.svd(A_reduced)
+            w = Vh[-1, :].conj()
+        except np.linalg.LinAlgError:
+            break
+
+        def r_handle(zz):
+            zz = np.asanyarray(zz)
+            num = np.zeros_like(zz, dtype=complex)
+            den = np.zeros_like(zz, dtype=complex)
+            
+            for i in range(len(w)):
+                with np.errstate(divide='ignore', invalid='ignore'):
+                    term = w[i] / (zz - z[i])
+                term[np.isinf(term)] = 0
+                num += term * f[i]
+                den += term
+            
+
+            with np.errstate(divide='ignore', invalid='ignore'):
+                res = num / den
+            
+
+            for i, idx in enumerate(J):
+                mask_close = np.isclose(zz, z[i], atol=1e-13)
+                if np.any(mask_close):
+                    res[mask_close] = f[i]
+            return res
+
+        R = r_handle(Z)
+        
+    return locals().get('r_handle', lambda x: np.mean(F) * np.ones_like(x))
+
+def floater_hormann(x_eval, x_nodes, y_nodes, d=3):
+    n = len(x_nodes)
+    d = min(d, n - 1)
+    w = np.zeros(n)
+    
+
+    for k in range(n):
+        s = 0.0
+        i_min = max(0, k - d)
+        i_max = min(n - 1 - d, k)
+        for i in range(i_min, i_max + 1):
+            prod = 1.0
+            for j in range(i, i + d + 1):
+                if j != k:
+                    prod *= 1.0 / np.abs(x_nodes[k] - x_nodes[j])
+            if (i % 2) == 1: s -= prod
+            else: s += prod
+        w[k] = (-1.0)**k * s
+
+    num = np.zeros_like(x_eval)
+    den = np.zeros_like(x_eval)
+    
+    for k in range(n):
+        with np.errstate(divide='ignore'):
+            term = w[k] / (x_eval - x_nodes[k])
+
+        mask_inf = np.isinf(term)
+        term[mask_inf] = 0
+        num += term * y_nodes[k]
+        den += term
+        
+    with np.errstate(divide='ignore', invalid='ignore'):
+        res = num / den
+        
+
+    for k in range(n):
+        mask_hit = np.isclose(x_eval, x_nodes[k], atol=1e-14)
+        if np.any(mask_hit):
+            res[mask_hit] = y_nodes[k]
+            
+    return res
+
+
+def get_func(index, x):
+    if index == 0: return np.sqrt(1.21 - x**2)
+    if index == 1: return np.sqrt(0.01 + x**2)
+    if index == 2: return np.tanh(5 * x)
+    if index == 3: return np.sin(40 * x)
+    if index == 4: return np.exp(-1 / x**2)
+    return np.zeros_like(x)
+
+func_names = [
+    r'(A) $\sqrt{1.21-x^2}$', r'(B) $\sqrt{0.01+x^2}$',
+    r'(C) $\tanh(5x)$', r'(D) $\sin(40x)$',
+    r'(E) $\exp(-1/x^2)$'
+]
+
+xx = np.linspace(-1, 1, 1000)
+fig = plt.figure(figsize=(15, 18))
+
+
+for plot_idx in range(5):
+    f_func = lambda x: get_func(plot_idx, x)
+    true_vals = f_func(xx)
+    n_values = np.arange(4, 201, 4)
+    errs = {k: [] for k in ['spline', 'poly', 'fourier_ext', 'fourier_poly', 'floater', 'aaa']}
+    
+    print(f"[{plot_idx+1}/5] Processing {func_names[plot_idx]}...")
+    
+    for n in n_values:
+        X = np.linspace(-1, 1, n)
+        F = f_func(X)
+        
+        # 1. Cubic Splines
+        try:
+            cs = CubicSpline(X, F)
+            errs['spline'].append(np.linalg.norm(true_vals - cs(xx), np.inf))
+        except: errs['spline'].append(np.nan)
+        
+        # 2. Polynomial Least-Squares (gamma=2)
+        try:
+            deg = int(n / 2)
+            T_mat = np.polynomial.chebyshev.chebvander(X, deg)
+            c, _, _, _ = lstsq(T_mat, F, lapack_driver='gelsy')
+            T_eval = np.polynomial.chebyshev.chebvander(xx, deg)
+            p_vals = T_eval @ c
+            errs['poly'].append(np.linalg.norm(true_vals - p_vals, np.inf))
+        except: errs['poly'].append(np.nan)
+
+        # 3. Fourier Extension to [-2, 2]
+        try:
+            M_modes = int(np.ceil(n / 4))
+            k_vec = np.arange(-M_modes, M_modes + 1)
+            A = np.exp(1j * np.pi * np.outer(X, k_vec) / 2.0)
+            c, _, _, _ = lstsq(A, F, lapack_driver='gelsy')
+            A_eval = np.exp(1j * np.pi * np.outer(xx, k_vec) / 2.0)
+            f_vals = np.real(A_eval @ c)
+            errs['fourier_ext'].append(np.linalg.norm(true_vals - f_vals, np.inf))
+        except: errs['fourier_ext'].append(np.nan)
+
+        # 4. Fourier + Low Degree Poly
+        try:
+            deg_p = int(np.round(np.sqrt(n)))
+            deg_p = deg_p + (deg_p + n + 1) % 2 
+            deg_f = (n - 1 - deg_p) // 2
+            
+            T_mat = np.polynomial.chebyshev.chebvander(X, deg_p)
+            if deg_f > 0:
+                k_f = np.arange(1, deg_f + 1)
+                Cos_mat = np.cos(np.pi * np.outer(X, k_f))
+                Sin_mat = np.sin(np.pi * np.outer(X, k_f))
+                A = np.hstack([Cos_mat, Sin_mat, T_mat])
+            else:
+                A = T_mat
+            c, _, _, _ = lstsq(A, F, lapack_driver='gelsy')
+            T_eval = np.polynomial.chebyshev.chebvander(xx, deg_p)
+            if deg_f > 0:
+                Cos_eval = np.cos(np.pi * np.outer(xx, k_f))
+                Sin_eval = np.sin(np.pi * np.outer(xx, k_f))
+                A_eval = np.hstack([Cos_eval, Sin_eval, T_eval])
+            else:
+                A_eval = T_eval
+            vals = A_eval @ c
+            errs['fourier_poly'].append(np.linalg.norm(true_vals - vals, np.inf))
+        except Exception as e: 
+            errs['fourier_poly'].append(np.nan)
+
+        # 5. Floater-Hormann (d=3)
+        try:
+            fh_vals = floater_hormann(xx, X, F, d=3)
+            errs['floater'].append(np.linalg.norm(true_vals - fh_vals, np.inf))
+        except: errs['floater'].append(np.nan)
+
+        # 6. AAA
+        try:
+            r = aaa(X, F, tol=1e-13)
+            aaa_vals = np.real(r(xx))
+            errs['aaa'].append(np.linalg.norm(true_vals - aaa_vals, np.inf))
+        except: errs['aaa'].append(np.nan)
+
+
+    ax = plt.subplot(3, 2, plot_idx + 1)
+    ax.semilogy(n_values, errs['spline'], '.-', lw=0.5, ms=4, label='Cubic splines')
+    ax.semilogy(n_values, errs['poly'], '.-', lw=0.5, ms=4, label='Poly least-squares')
+    ax.semilogy(n_values, errs['fourier_ext'], '.-', lw=0.5, ms=4, color='#CCCC00', label='Fourier extension')
+    ax.semilogy(n_values, errs['fourier_poly'], '.-', lw=0.5, ms=4, color='purple', label='Fourier + poly')
+    ax.semilogy(n_values, errs['floater'], '.-', lw=0.5, ms=4, color='green', label="Floater-Hormann 'equi'")
+    ax.semilogy(n_values, errs['aaa'], 'k.-', lw=1.0, ms=5, label='AAA')
+
+    # Instability reference for A and D
+    if plot_idx in [0, 3]:
+        instability = 1e-16 * (1.14)**n_values
+        ax.semilogy(n_values, instability, ':', color='gray', alpha=0.5)
+
+    ax.set_title(func_names[plot_idx])
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim(1e-16, 100)
+
+
+ax_legend = plt.subplot(3, 2, 6)
+ax_legend.axis('off')
+
+l1, = ax_legend.plot([], [], '.-', lw=0.5, ms=4, label='Cubic splines') # 預設藍色
+l2, = ax_legend.plot([], [], '.-', lw=0.5, ms=4, label='Poly least-squares') # 預設橘色
+l3, = ax_legend.plot([], [], '.-', lw=0.5, ms=4, color='#CCCC00', label='Fourier extension')
+l4, = ax_legend.plot([], [], '.-', lw=0.5, ms=4, color='purple', label='Fourier + poly')
+l5, = ax_legend.plot([], [], '.-', lw=0.5, ms=4, color='green', label="Floater-Hormann 'equi'")
+l6, = ax_legend.plot([], [], 'k.-', lw=1.0, ms=5, label='AAA')
+
+legend = ax_legend.legend(handles=[l1, l2, l3, l4, l5, l6], 
+                          loc='center', 
+                          fontsize='medium', 
+                          frameon=True, # 顯示圖例邊框
+                          title="Methods Key")
+legend.get_title().set_fontsize('large')
+
+plt.tight_layout()
+plt.show()
+```
+
+![figure](figure1.jpg)
+
+![figure](figure2.jpg)
+
+![figure](figure3.jpg)
+
 * Dominance of AAA:AAA outperforms all other methods in almost every case and is consistently the first to reach an accuracy of $$10^{-10}$$.
 
 * Capturing singularities: For $$f_C(x)=\tanh(5x)$$, AAA rapidly detects the nearby poles, leading to extremely fast convergence.
