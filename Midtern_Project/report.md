@@ -3,10 +3,10 @@
 <br></br>
 **Abstract**
 
-This report studies and reproduces the core ideas of *“The AAA Algorithm for Rational Approximation”* by Nakatsukasa, Sète, and Trefethen (2017). The AAA algorithm provides a numerically stable, adaptive, and automatic method to construct rational approximations of complex-valued functions.  It transforms a nonlinear rational fitting problem into a sequence of linear least-squares problems via barycentric representation and singular value decomposition (SVD). In this work, we implement both simplified and advanced versions of the algorithm in Python, apply it to the function $$f(z) = \tan(\pi z / 2)$$ , and visualize its behavior. The results confirm exponential convergence, automatic detection of poles near singularities, and robustness against numerical instability. Through theoretical explanation and experimental visualization, this study demonstrates how AAA achieves near machine precision with minimal parameters, highlighting its potential in model reduction, system identification, and analytic continuation.
+This report studies and reproduces the core ideas of *“The AAA Algorithm for Rational Approximation”* by Nakatsukasa, Sète, and Trefethen (2017). The AAA algorithm provides a numerically stable, adaptive, and automatic method to construct rational approximations of complex-valued functions.  It transforms a nonlinear rational fitting problem into a sequence of linear least-squares problems via barycentric representation and singular value decomposition (SVD). In this work, we implement both simplified and advanced versions of the algorithm in Python, apply it to the function $$f(z) = \tan(\pi z / 2)$$ , and visualize its behavior. The results confirm exponential convergence, automatic detection of poles near singularities, and robustness against numerical instability. Through theoretical explanation and experimental visualization, this study demonstrates how AAA achieves near machine precision with minimal parameters(requiring no user input parameters), highlighting its potential in model reduction, system identification, and analytic continuation.
 
 <br></br>
-**Ⅰ. Introduction 、 Problem Description and Motivataion**
+**Ⅰ. Introduction 、 Problem Description and Motivation**
 
 #### Background and Motivation
 
@@ -97,7 +97,7 @@ $$A = \mathrm{diag}(F|_{Z'}) C - C \cdot \mathrm{diag}(\{f_j\}_{j=1}^k)$$
 
 ##### Froissart Doublets
 
-In practice, spurious pole-zero pairs with negligible residues may appear. These can harm stability and accuracy. The cleanup procedure checks the poles' residues and removes support points associated with negligible residues, then recomputes the least-squares solution to improve stability.
+In practice, spurious pole-zero pairs with negligible residues may appear,the algorithm identifies spurious poles by looking for residues that are very small (specifically residues $$< 10^{-13}$$). These can harm stability and accuracy. The cleanup procedure checks the poles's residues and removes support points associated with negligible residues, then recomputes the least-squares solution to improve stability.
 
 <br></br>
 
@@ -216,6 +216,10 @@ over a rectangular grid in the complex plane.
 * The color scale is logarithmic, showing accuracy down to machine precision.
 
 The AAA approximation maintains near-machine accuracy away from singularities, confirming its numerical robustness.
+
+The power of AAA lies in its ability to accurately capture the location of poles and residues even when the error value is large near the poles. 
+
+This is the core value of analytic continuation.
 
 </td>
 </tr>
@@ -395,11 +399,11 @@ Through both simplified and advanced implementations, this study validates the a
 * Effective Pole Handling:The algorithm naturally identifies and places poles close to the true singularities of the function $$f(z)=tan(πz/2)$$ , outperforming polynomial interpolation which fails near singularities due to the Runge phenomenon.
 * Demonstrated Practical Implementations:
   * The first three figures illustrate the algebraic core of the algorithm and its educational value.
-  * The fourth and fifth figures further expand this foundation through cleansing the Frouissar bimodalities, residual analysis, and tolerance control, thereby enabling reliable large-scale applications.
+  * The fourth and fifth figures further expand this foundation through cleansing the Froissart doublets, residual analysis, and tolerance control, thereby enabling reliable large-scale applications.
 
 #### Problem
 * Heuristic Nature:The greedy selection strategy yields locally optimal, but not globally minimax, approximations.
-* Computational Cost:The per-iteration SVD computation leads to $$O(Nm^{2})$$ to $$O(Nm^{3})$$ time complexity for large-scale data, making it computationally demanding for very large $$N.$$
+* Computational Cost:The per-iteration SVD computation the complexity is $$$O(Mm^3)$$ flops, where $$M$$ is the size of the sample set and $$m$$ is the number of iterations3. Since $$m$$ (iterations) is usually small compared to $$M$$ (sample size), making it computationally demanding for very large $$N.$$
 * Spurious Pole-Zero Pairs:The presence of Froissart doublets necessitates post-processing , which increases computational complexity.
 
 The AAA algorithm bridges the gap between numerical stability, analytical rigor, and computational efficiency in rational approximation.
