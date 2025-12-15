@@ -4,7 +4,9 @@ $$y' = y(1 - y), \quad y(0) = y_0, \quad 0 < y_0 < 1.$$
 
 Find the range of $h$ such that the solution is qualitatively correct.
 
----
+<br></br>
+
+**Sol:**
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +24,6 @@ def forward_euler_logistic(y0, h, t_end=10):
         y[n+1] = y[n] + h * f_logistic(y[n])
     
     return t, y
-
 
 y0 = 0.2
 hs = [0.1, 1.0, 1.9, 2.1] 
@@ -65,14 +66,14 @@ By performing a linearization around the stable equilibrium point $y=1$ and appl
 Therefore, to correctly approximate the solution qualitatively (i.e., converge to $y=1$), the step size must satisfy
 $$\boxed{0 < h < 2.}$$
 
----
+<br></br>
 
 **Explanation and Intuitive Understanding**
 
 * Behavior near Equilibrium: Near the stable equilibrium $y=1$, the original non-linear equation can be approximated by the linear ODE $$z' = -1\cdot z$$ (where $$z=y-1$$). The solution in this region exponentially decays back to the equilibrium.
 * Role of $$h$$: The Forward Euler method needs $$h < 2$$ to correctly simulate this exponential decay. If $$h$$ exceeds 2, the numerical amplification factor $$(1-h)$$ will have an absolute value greater than 1, causing the solution to oscillate or grow away from $$y=1$$, resulting in a qualitatively incorrect result.
 
----
+<br></br>
 
 **Numerical Examples**
 
@@ -82,9 +83,10 @@ Using the initial value $$y_0=0.2$$ in the Forward Euler method, the following b
 * $$h=1.0$$: Stable, converges to $$y=1$$, but with lower accuracy.
 * $$h=1.9$$: Close to the stability boundary ($$0<h<2$$), may show minor oscillation or overshoot, but remains qualitatively correct (converges to $y=1$).
 * $$h=2.1$$: Exceeds the boundary ($$h>2$$), resulting in large oscillations or divergence, making the numerical solution qualitatively incorrect.
+
 ![Forward Euler Stability for Logistic Equation y'=y(1-y) showing h=2.1 diverging while h<2 remains stable.](圖三.jpg)
 
----
+<br></br>
 
 **Recommendations**
 
@@ -92,6 +94,7 @@ Using the initial value $$y_0=0.2$$ in the Forward Euler method, the following b
 * For Accuracy and Stability: It is generally recommended to choose a much smaller step size, such as $h \le 0.5$ or smaller, depending on the required precision.
 * For Stiff Problems: For problems with much stronger decay/growth terms (larger $|\lambda|$), an implicit method (like Backward Euler) is recommended to avoid severe restrictions on $h$.
 
----
+<br></br>
+
 **Programing**
 link:https://colab.research.google.com/drive/11bV7JblL4nw54jSwVEkzq0fiji16vBYx?usp=sharing
