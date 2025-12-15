@@ -6,7 +6,8 @@ $$\int_0^\infty \frac{1}{1 + 25x^2} dx$$
 2.
 $$\int_0^1 \frac{\ln(x)}{1 + 25x^2} dx$$
 
----
+<br></br>
+
 ```python
 import numpy as np
 from scipy import integrate
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 | Absolute Error | $0.00 \times 10^{+00}$ |
 | Requirement Met? | yes |
 
----
+<br></br>
 * $$\int_0^1 \frac{\ln(x)}{1+25x^2} dx$$
 
 | Metric | Value |
@@ -84,7 +85,7 @@ if __name__ == "__main__":
 | Estimated Error | $$7.65 \times 10^{-13}$$ |
 | Requirement Met? | yes |
 
----
+<br></br>
 * High-precision validation with mpmath (50 digits):
 
 | Metric | Value |
@@ -92,7 +93,7 @@ if __name__ == "__main__":
 | **Result (mpmath)** | $-0.545444563419798$ |
 | **Absolute Error** | $2.22 \times 10^{-16}$ |
 
----
+<br></br>
 
 * Final Summary
 
@@ -105,7 +106,8 @@ if __name__ == "__main__":
   * The first integral, $\int_0^\infty \frac{1}{1+25x^2} dx$, was analytically verified against its exact value, which is $\frac{\pi}{10}$.
   * The second integral, $\int_0^1 \frac{\ln(x)}{1+25x^2} dx$, was verified using the high-precision integration capabilities of the `mpmath` library.
 
----
+<br></br>
+
 **Programing**
 link:https://colab.research.google.com/drive/172BRKa3BMVr5Pu2PM1V2m4YW264hcnAc?usp=sharing
 
