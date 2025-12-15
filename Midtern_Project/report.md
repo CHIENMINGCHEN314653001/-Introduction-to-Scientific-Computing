@@ -1,11 +1,11 @@
 **Application of the AAA Algorithm in Rational Approximation**
 
----
+<br></br>
 **Abstract**
 
 This report studies and reproduces the core ideas of *“The AAA Algorithm for Rational Approximation”* by Nakatsukasa, Sète, and Trefethen (2017). The AAA algorithm provides a numerically stable, adaptive, and automatic method to construct rational approximations of complex-valued functions.  It transforms a nonlinear rational fitting problem into a sequence of linear least-squares problems via barycentric representation and singular value decomposition (SVD). In this work, we implement both simplified and advanced versions of the algorithm in Python, apply it to the function $$f(z) = \tan(\pi z / 2)$$ , and visualize its behavior. The results confirm exponential convergence, automatic detection of poles near singularities, and robustness against numerical instability. Through theoretical explanation and experimental visualization, this study demonstrates how AAA achieves near machine precision with minimal parameters, highlighting its potential in model reduction, system identification, and analytic continuation.
 
----
+<br></br>
 **Ⅰ. Introduction 、 Problem Description and Motivataion**
 
 #### Background and Motivation
@@ -39,7 +39,7 @@ that approximates $f$ with minimal error (in either uniform or least-squares sen
 
 For functions with poles or branch cuts, polynomial approximations perform poorly, whereas rational functions can efficiently approximate such behaviors with lower degrees. Rational approximation forms the foundation of model reduction, frequency response fitting, analytic continuation, and data compression.
 
----
+<br></br>
 
 **Ⅱ. Method**
 
@@ -99,7 +99,7 @@ $$A = \mathrm{diag}(F|_{Z'}) C - C \cdot \mathrm{diag}(\{f_j\}_{j=1}^k)$$
 
 In practice, spurious pole-zero pairs with negligible residues may appear. These can harm stability and accuracy. The cleanup procedure checks the poles' residues and removes support points associated with negligible residues, then recomputes the least-squares solution to improve stability.
 
----
+<br></br>
 
 **Ⅲ.Implementation**
 
@@ -115,7 +115,7 @@ A compact implementation demonstrates the algebraic core of AAA:
 
 This version highlights the Cauchy matrix, Loewner matrix, SVD .
 
----
+<br></br>
 
 **Ⅳ. Experiment**
 
@@ -150,7 +150,7 @@ $$f(z) = \tan\left(\frac{\pi z}{2}\right)$$
 
 using the compact Python implementation.
 
----
+<br></br>
 
 ##### Figure 1
 <table>
@@ -194,7 +194,7 @@ ax1.set_xlabel('Re(z)'); ax1.set_ylabel('Im(z)')
 ax1.axis('equal')
 ax1.set_xlim([-1.6, 1.6]); ax1.set_ylim([-1.6, 1.6])
 ```
----
+<br></br>
 
 ##### Figure 2
 
@@ -246,7 +246,7 @@ ax2.set_xlim([-1.6, 1.6]); ax2.set_ylim([-1.6, 1.6])
 plt.tight_layout()
 plt.show()
 ```
----
+<br></br>
 
 ##### Figure 3
 
@@ -285,7 +285,7 @@ if errvec.size > 0:
     plt.grid(True, which="both", ls="--", alpha=0.6)
 plt.show()
 ```
----
+<br></br>
 ##### Visualization
 
 Visualize its convergence behavior and the resulting rational approximation of  
@@ -294,7 +294,7 @@ $$f(z) = \tan\left(\frac{\pi z}{2}\right)$$
 
 along the complex line $$z = t + 0.1j t.$$
 
----
+<br></br>
 ##### Figure4
 <table>
 <tr>
@@ -338,7 +338,8 @@ M = 300
     plt.show()
 ```
 
----
+<br></br>
+
 ##### Figure5
 <table>
 <tr>
@@ -379,7 +380,7 @@ plt.figure(figsize=(7, 5))
     plt.show()
 ```
 
----
+<br></br>
 
 
 #### Ⅴ. Conclusion
@@ -405,13 +406,14 @@ The AAA algorithm bridges the gap between numerical stability, analytical rigor,
 Its adaptability, compactness, and extensibility make it a cornerstone technique for future research in model reduction, system identification, and complex-domain analysis.
 
 
----
+<br></br>
 
 **Ⅵ. Reference**
 
 Nakatsukasa, Y., Sète, O., and Trefethen, L. N., *"The AAA algorithm for rational approximation"*, arXiv:1612.00337v2 (2017).
 
----
+<br></br>
+
 **Programing**
 
 link:https://colab.research.google.com/drive/1Pt3DuwMfc9mTfKGdq4NsKjE9YsluR4bE?usp=sharing
