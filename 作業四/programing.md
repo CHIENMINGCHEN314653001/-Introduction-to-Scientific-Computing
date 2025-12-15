@@ -8,6 +8,8 @@ $$\int_0^1 \frac{\ln(x)}{1 + 25x^2} dx$$
 
 <br></br>
 
+**Sol:**
+
 ```python
 import numpy as np
 from scipy import integrate
