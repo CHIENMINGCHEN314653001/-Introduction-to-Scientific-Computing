@@ -12,6 +12,8 @@ $$r = aaa(F)$$
 
 If a polynomial rather than a rational function is required, the rational approximant can be converted afterward.
 
+<br></br>
+
 **Numerical interpolant vs. exact interpolation**
 
 The output of AAA is generally not a mathematically exact interpolant (i.e., it does not necessarily have degree $$n-1$$). Instead, it produces a numerical interpolant. This distinction is crucial for robustness.
@@ -52,13 +54,14 @@ The paper compares AAA against five major competing approaches.
 
 * Polynomial Least Squares (PLS)
 
-Direct polynomial interpolation with degree $$d=n-1$$ leads to error growth of order
+  Direct polynomial interpolation with degree $$d=n-1$$ leads to error growth of order
 
 $$
 O(2^n).
 $$
 
-Using a reduced degree $$d \approx n/\gamma$$ with oversampling factor $$\gamma>1$$ mitigates this instability. For example, when $$\gamma=2$$, the growth rate is reduced to approximately
+  $$\quad$$ $$\quad$$ Using a reduced degree $$d \approx n/\gamma$$ with oversampling factor $$\gamma>1$$ mitigates this instability. For example, when $$\gamma=2$$, the growth rate is 
+  $$\quad$$ $$\quad$$ $$\quad$$ reduced to approximately
 
 $$
 (1.14)^n.
@@ -66,15 +69,15 @@ $$
 
 * Fourier Extension
 
-The function is approximated by a Fourier series defined on an extended interval $$[-T,T]$$. In the experiments, $$T=2$$ , oversampling factor $$=2.$$ are used.
+   The function is approximated by a Fourier series defined on an extended interval $$[-T,T]$$. In the experiments, $$T=2$$ , oversampling factor $$=2$$ are used.
 
 * Fourier Series with Corrections
 
-This method combines a trigonometric approximation with polynomial correction terms to handle endpoint discontinuities. In the experiments, the Fourier series is augmented by a polynomial of degree approximately $$\sqrt{n}$$.
+  This method combines a trigonometric approximation with polynomial correction terms to handle endpoint discontinuities. In the experiments, the Fourier series is augmented by a polynomial of degree approximately $$\sqrt{n}$$.
 
 * Splines
 
-Cubic splines are employed. They are extremely stable but converge only algebraically, with a fixed rate of
+  Cubic splines are employed. They are extremely stable but converge only algebraically, with a fixed rate of
 
 $$
 O(n^{-4}).
@@ -82,7 +85,7 @@ $$
 
 * Floater–Hormann Rational Interpolation (Chebfun `equi`)
 
-This is a barycentric rational interpolant guaranteed to have no poles in $$[-1,1]$$. Chebfun’s `equi` option adaptively selects the interpolation degree.
+  This is a barycentric rational interpolant guaranteed to have no poles in $$[-1,1]$$. Chebfun’s `equi` option adaptively selects the interpolation degree.
 
 <br></br>
 
@@ -641,3 +644,5 @@ combined with a nonlinear, adaptive algorithm, achieves a breakthrough in the cl
 **Programing**
 
 Link:https://colab.research.google.com/drive/1-PGSjd8yYPAOhu8xkHNrHAOpCg9G0HyH?usp=sharing
+
+Link:https://colab.research.google.com/drive/1KKn37IgsWJt2F5UR5gTvlHzcY6LIe5kU?usp=sharing
