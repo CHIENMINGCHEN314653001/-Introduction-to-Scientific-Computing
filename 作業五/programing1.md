@@ -1,4 +1,4 @@
-### Forward & Backward Euler Method Analysis
+#### Forward & Backward Euler Method Analysis
 
 **Problem Statement:I Solve the following two Ordinary Differential Equations using the respective Euler methods:**
 
@@ -14,7 +14,10 @@ $$y' = 5y, \quad y(0) = 1$$
 
 $$\quad$$ $$\quad$$ $$\quad$$  Solve the problem for $t \in [0, 10]$ with step sizes $h = 0.4, h = 0.41 \text{ and } h = 0.1$.
 
----
+<br></br>
+
+*Sol:*
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,7 +30,6 @@ def forward_euler(h):
         y[n + 1] = y[n] * (1 - 5 * h)
     return t, y
 
-
 def backward_euler(h):
     t = np.arange(0, 10 + h, h)
     y = np.zeros_like(t)
@@ -36,13 +38,10 @@ def backward_euler(h):
         y[n + 1] = y[n] / (1 - 5 * h)
     return t, y
 
-
 t_exact = np.linspace(0, 10, 500)
 y_forward_exact = np.exp(-5 * t_exact)
 y_backward_exact = np.exp(5 * t_exact)
-
 hs = [0.4, 0.41, 0.1]
-
 plt.figure(figsize=(14, 6))
 
 plt.subplot(1, 2, 1)
@@ -56,7 +55,6 @@ plt.xlabel('t', fontsize=12)
 plt.ylabel('y(t)', fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True, alpha=0.4)
-
 plt.subplot(1, 2, 2)
 colors = ['tab:blue', 'tab:purple', 'tab:cyan']
 for i, h in enumerate(hs):
@@ -68,13 +66,11 @@ plt.xlabel('t', fontsize=12)
 plt.ylabel('y(t)', fontsize=12)
 plt.legend(fontsize=10, loc='upper left')
 plt.grid(True, alpha=0.4)
-
 plt.tight_layout()
-
 plt.savefig("euler_method_comparison.png", dpi=300, bbox_inches='tight')
 plt.show()
 ```
----
+<br></br>
 
 #### Observations
 
@@ -95,7 +91,7 @@ plt.show()
 
 ![Figure 2: Backward Euler Method ($$y' = 5y, y(0)=1$$) results for various step sizes. Demonstrates unconditional stability.](圖二.jpg)
 
----
+<br></br>
 
 ## Conclusions
 
@@ -104,7 +100,7 @@ plt.show()
 | Forward Euler  | Conditionally stable | Diverges if $$h > 0.4$$ | $$h < 0.4$$  |
 | Backward Euler | Unconditionally stable | Stable for any $$h$$  | Any $$h$$ |
 
----
+<br></br>
 
 **Summary**
 
@@ -112,6 +108,7 @@ plt.show()
 * Backward Euler is an implicit method, which is inherently more stable, particularly for stiff ODEs or those with rapidly growing solutions. However, it is generally computationally heavier as it requires solving an equation at each step.
 * The visual comparison from the plots clearly illustrates how step size significantly impacts both the stability and accuracy of these numerical methods.
 
----
+<br></br>
+
 **Programing**
 link:https://colab.research.google.com/drive/1QpG1O0_r_LfSCde9M3tXlooyjB8A3-ig?usp=sharing
