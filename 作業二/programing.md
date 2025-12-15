@@ -1,7 +1,9 @@
 **Consider approximating the Runge function. Let $$𝑁+1$$ be the number of nodes.**
 * Using cubic spline interpolation, find $$𝑁$$ such that the error of approximation is less than $$10^{−10}.$$
 * Using Chebyshev nodes, find $$𝑁$$ such that the error of approximation is less than $$10^{−10}.$$
----
+
+<br></br>
+**Sol:**
 
 ```python
 import numpy as np
@@ -136,15 +138,15 @@ if __name__ == "__main__":
     main()
 ```
 
----
+<br></br>
 
-# Runge Function Interpolation Analysis Results
+**Runge Function Interpolation Analysis Results**
 
 #### Target Error
 
 $$\text{Target Maximum Error} = 10^{-10}$$
 
----
+<br></br>
 
 **Runge Function Original Shape**
 
@@ -154,7 +156,7 @@ $$f(x) = \frac{1}{1+25x^2}$$
 
 ![Figure 1: Original graph of the Runge function $f(x) = \frac{1}{1+25x^2}$](圖一.jpg)
 
----
+<br></br>
 
 **Cubic Spline Interpolation**
 
@@ -174,7 +176,7 @@ Results of cubic spline interpolation on uniformly spaced nodes:
 
 ![Figure 2: Cubic Spline Interpolation result with N=500, highly overlapping with the true function](圖二.jpg)
 
----
+<br></br>
 
 **Chebyshev Node Interpolation**
 
@@ -190,11 +192,11 @@ Results of interpolation using non-uniformly spaced Chebyshev nodes:
 
 * Conclusion: The Chebyshev interpolation did not achieve the target precision of $$10^{-10}$$ within the range of $$N \le 100.$$ (Note: Although $$5.62 \times 10^{-9}$$ is close to the target, it is strictly greater than $$10^{-10}$$ ).
 
-**Figure**
+
 
 ![Figure 3: Chebyshev Node Interpolation result with N=100, showing non-uniform node distribution](圖三.jpg)
 
----
+<br></br>
 
 **Final Comparison Results**
 
@@ -205,7 +207,7 @@ Comparison of resource consumption and performance for both methods when achievi
 | Cubic Spline Interpolation | 500 | $$1.01 \times 10^{-8}$$ | 0.036 |
 | Chebyshev Interpolation | 100 | $$5.62 \times 10^{-9}$$ | 0.135 |
 
----
+<br></br>
 
 **Conclusion**
 
@@ -217,6 +219,7 @@ Comparison of resource consumption and performance for both methods when achievi
 
 ![Figure 4: Comparison of Absolute Errors (Log Scale) for both interpolation methods. The peak error of Chebyshev interpolation (blue line) is lower than that of cubic spline interpolation (red line), and convergence is better at the boundaries.](圖四.jpg)
 
----
+<br></br>
+
 **Programing**
 link:https://colab.research.google.com/drive/1dYs9uwoncZql1Pp9KEjHVFNbfD40fok2?usp=sharing
